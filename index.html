@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SUPPORTEWP | Executive Presentation</title>
+  <title>SUPPORTEWP | Multi-Chart Analytics</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0B1120; /* Deep Navy */
-      --surface: #1E293B; /* Slate 800 */
-      --surface-light: #334155; /* Slate 700 */
-      --accent-blue: #0EA5E9; /* Sky 500 */
-      --accent-green: #10B981; /* Emerald 500 */
+      --bg-dark: #0B1120; 
+      --surface: #1E293B; 
+      --surface-light: #334155; 
+      --accent-blue: #0EA5E9; 
+      --accent-green: #10B981; 
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
       --border-subtle: rgba(255, 255, 255, 0.06);
@@ -31,7 +31,6 @@
       background-repeat: no-repeat;
     }
 
-    /* Corporate Card */
     .corp-card {
       background: rgba(30, 41, 59, 0.4);
       border: 1px solid var(--border-subtle);
@@ -40,16 +39,10 @@
       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .corp-card:hover {
-      background: rgba(30, 41, 59, 0.6);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
-    }
 
-    /* Typography Hierarchy */
     .kpi-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .kpi-value { font-size: 3.5rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
 
-    /* Button Professional */
     .btn-sync {
       background: var(--surface-light); color: white;
       border: 1px solid rgba(255,255,255,0.1);
@@ -57,7 +50,6 @@
     }
     .btn-sync:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
 
-    /* Clean Table */
     .clean-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
     .clean-table th {
       color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;
@@ -69,17 +61,18 @@
     }
     .clean-table td:first-child { border-left: 1px solid transparent; border-radius: 8px 0 0 8px; }
     .clean-table td:last-child { border-right: 1px solid transparent; border-radius: 0 8px 8px 0; }
-    .clean-table tbody tr:hover td { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.05); }
+    .clean-table tbody tr:hover td { background: rgba(255,255,255,0.04); }
 
-    /* Data Bar */
     .data-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
     .data-bar-fill { height: 100%; background: var(--accent-blue); border-radius: 4px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* Animations */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-in { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
     
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); display: inline-block; }
+    
+    /* Chart Containers */
+    .chart-box { position: relative; height: 260px; width: 100%; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -96,7 +89,7 @@
       <div class="text-right hidden md:block">
         <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">System Status</p>
         <div class="flex items-center gap-2 text-sm font-medium">
-          <span class="status-dot"></span> <span id="lastUpdate">Live Connected</span>
+          <span class="status-dot animate-pulse"></span> <span id="lastUpdate">Live Connected</span>
         </div>
       </div>
       <button id="fetchBtn" onclick="fetchData()" class="btn-sync flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm">
@@ -109,80 +102,93 @@
     </div>
   </header>
 
-  <main class="flex-1 max-w-[1600px] w-full mx-auto px-8 pb-12 flex flex-col gap-8">
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-8 pb-12 flex flex-col gap-6">
     
-    <div class="corp-card p-6 flex items-start gap-4 animate-in" style="animation-delay: 0.1s; border-left: 4px solid var(--accent-blue);">
-      <div class="p-3 bg-sky-500/10 rounded-xl text-sky-400 shrink-0">
+    <div class="corp-card p-5 flex items-start gap-4 animate-in" style="animation-delay: 0.1s; border-left: 4px solid var(--accent-blue);">
+      <div class="p-2.5 bg-sky-500/10 rounded-xl text-sky-400 shrink-0">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
       <div>
-        <h3 class="text-sm font-bold text-slate-300 mb-1">Executive Insight</h3>
-        <p id="insightText" class="text-lg text-white font-medium leading-relaxed">กำลังดึงข้อมูลเพื่อสรุปผลการดำเนินงานล่าสุด...</p>
+        <h3 class="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Executive Insight</h3>
+        <p id="insightText" class="text-base text-white font-medium leading-relaxed">กำลังดึงข้อมูลเพื่อประมวลผลการวิเคราะห์...</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="corp-card p-8 animate-in" style="animation-delay: 0.2s;">
+      <div class="corp-card p-6 animate-in" style="animation-delay: 0.2s;">
         <p class="kpi-title mb-2">Total Case Volume</p>
         <div class="flex items-end gap-3">
           <div id="totalCases" class="kpi-value num-font text-white">0</div>
-          <div class="pb-2 text-slate-400 font-medium">Cases</div>
+          <div class="pb-2 text-slate-400 font-medium">รายการ</div>
         </div>
       </div>
-      <div class="corp-card p-8 animate-in" style="animation-delay: 0.3s;">
+      <div class="corp-card p-6 animate-in" style="animation-delay: 0.3s;">
         <p class="kpi-title mb-2">Active Personnel</p>
         <div class="flex items-end gap-3">
           <div id="totalStaff" class="kpi-value num-font text-sky-400">0</div>
-          <div class="pb-2 text-slate-400 font-medium">Officers</div>
+          <div class="pb-2 text-slate-400 font-medium">ท่าน</div>
         </div>
       </div>
-      <div class="corp-card p-8 animate-in" style="animation-delay: 0.4s;">
+      <div class="corp-card p-6 animate-in" style="animation-delay: 0.4s;">
         <p class="kpi-title mb-2 flex items-center justify-between">
-          <span>Auto Refresh</span>
-          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Auto Refresh In</span>
         </p>
         <div class="flex items-end gap-3">
           <div id="timerNum" class="kpi-value num-font text-emerald-400">60</div>
-          <div class="pb-2 text-slate-400 font-medium">Secs</div>
+          <div class="pb-2 text-slate-400 font-medium">วินาที</div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 animate-in" style="animation-delay: 0.5s;">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in" style="animation-delay: 0.5s;">
       
-      <div class="corp-card p-8 xl:col-span-1 flex flex-col">
-        <h2 class="text-base font-bold text-white mb-6">Top 5 Workload Distribution</h2>
-        <div class="flex-1 relative min-h-[300px]">
-          <canvas id="topStaffChart"></canvas>
+      <div class="corp-card p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Top 5 Performers (ผู้นำภาระงานสูงสุด)</h2>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded">Ranked</span>
+        </div>
+        <div class="chart-box">
+          <canvas id="barChart"></canvas>
         </div>
       </div>
 
-      <div class="corp-card p-8 xl:col-span-2 overflow-x-auto">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-base font-bold text-white">Resource Allocation Matrix</h2>
-          <span class="px-3 py-1 rounded bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">Sorted by Volume</span>
+      <div class="corp-card p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Workload Share (สัดส่วนภาระงาน)</h2>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded">Proportion</span>
         </div>
-        <table class="clean-table text-left">
-          <thead>
-            <tr>
-              <th class="w-16">Rank</th>
-              <th>Officer Name</th>
-              <th class="w-32 text-right">Assigned</th>
-              <th class="w-48 pl-8">Capacity Load</th>
-              <th class="w-32 text-center">Status</th>
-            </tr>
-          </thead>
-          <tbody id="dataTable">
-            <tr><td colspan="5" class="text-center py-12 text-slate-500">รอการเชื่อมต่อข้อมูล...</td></tr>
-          </tbody>
-        </table>
+        <div class="chart-box flex items-center justify-center">
+          <canvas id="doughnutChart"></canvas>
+        </div>
       </div>
 
     </div>
+
+    <div class="corp-card p-6 overflow-x-auto animate-in" style="animation-delay: 0.6s;">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Detailed Resource Allocation</h2>
+      </div>
+      <table class="clean-table text-left">
+        <thead>
+          <tr>
+            <th class="w-16">Rank</th>
+            <th>Officer Name</th>
+            <th class="w-32 text-right">Cases</th>
+            <th class="w-48 pl-8">Capacity Load</th>
+            <th class="w-32 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="dataTable">
+          <tr><td colspan="5" class="text-center py-12 text-slate-500">รอการเชื่อมต่อข้อมูล...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </main>
 
   <script>
-    let chart = null;
+    let barChart = null;
+    let doughnutChart = null;
     let staffData = [];
     let countdownInterval = null;
     let timeRemaining = 60;
@@ -196,18 +202,11 @@
       const btn = document.getElementById('fetchBtn');
       const icon = document.getElementById('fetchIcon');
       btn.disabled = true; 
-      icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>`;
       icon.classList.add('animate-spin');
       
-      try {
-        await doFetch();
-      } catch (e) {
-        Swal.fire({ icon: 'error', title: 'Data Source Error', text: 'ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบการเชื่อมต่อ', background: '#1E293B', color: '#fff' });
-      } finally {
-        btn.disabled = false; 
-        icon.classList.remove('animate-spin');
-        startCountdown();
-      }
+      try { await doFetch(); } 
+      catch (e) { Swal.fire({ icon: 'error', title: 'Data Source Error', background: '#1E293B', color: '#fff' }); } 
+      finally { btn.disabled = false; icon.classList.remove('animate-spin'); startCountdown(); }
     }
 
     async function fetchDataAuto() {
@@ -252,7 +251,12 @@
       document.getElementById('lastUpdate').textContent = `Synced: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
 
       updateSmartInsights(total);
-      updateChart(staffData.slice(0, 5));
+      
+      // Update Both Charts
+      const top5 = staffData.slice(0, 5);
+      renderBarChart(top5);
+      renderDoughnutChart(top5, total);
+      
       updateTable(total);
     }
 
@@ -260,11 +264,15 @@
       if(staffData.length === 0) return;
       const top = staffData[0];
       const avg = Math.round(total / staffData.length);
-      const text = `ภาพรวมขณะนี้ มีเจ้าหน้าที่หมุนเวียน <b>${staffData.length} ท่าน</b> จัดการเอกสารรวม <b>${total.toLocaleString()} รายการ</b> (เฉลี่ย ${avg} งาน/ท่าน) โดยผู้ที่รับผิดชอบโหลดงานสูงสุดคือ <b>คุณ${top.name}</b> (${top.count} รายการ)`;
+      
+      // Calculate Top 5 combined workload %
+      const top5Total = staffData.slice(0,5).reduce((sum, d) => sum + d.count, 0);
+      const top5Pct = ((top5Total / total) * 100).toFixed(1);
+
+      const text = `ปัจจุบันมีเจ้าหน้าที่ปฏิบัติงาน <b>${staffData.length} ท่าน</b> จัดการเอกสารรวม <b>${total.toLocaleString()} รายการ</b> (เฉลี่ย ${avg} งาน/ท่าน) <br> กลุ่ม Top 5 รับผิดชอบงานคิดเป็น <b>${top5Pct}%</b> ของทั้งระบบ โดย <b>คุณ${top.name.split(' ')[0]}</b> มีโหลดงานสูงสุด (${top.count} รายการ)`;
       
       const insightEl = document.getElementById('insightText');
       insightEl.innerHTML = text;
-      // แอนิเมชันกระพริบเบาๆ ให้รู้ว่าข้อมูลอัปเดตแล้ว
       insightEl.style.opacity = '0.5';
       setTimeout(() => insightEl.style.opacity = '1', 200);
     }
@@ -293,6 +301,92 @@
       }, 1000);
     }
 
+    // 📊 CHART 1: Horizontal Bar Chart
+    function renderBarChart(data) {
+      const ctx = document.getElementById('barChart').getContext('2d');
+      if (barChart) barChart.destroy();
+      barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.map(d => d.name.split(' ')[0]),
+          datasets: [{
+            data: data.map(d => d.count),
+            backgroundColor: 'rgba(14, 165, 233, 0.85)', // Sky 500
+            hoverBackgroundColor: '#38BDF8',
+            borderRadius: 4,
+            barThickness: 20,
+          }]
+        },
+        options: {
+          indexAxis: 'y', // เปลี่ยนเป็นแนวนอนเพื่อให้อ่านชื่อผู้ปฏิบัติงานง่ายขึ้น
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0F172A', titleFont: { family: 'Sarabun' }, bodyFont: { family: 'Sarabun' },
+              callbacks: { label: c => ` ภาระงาน: ${c.raw} รายการ` }
+            }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { family: 'Chakra Petch' } } },
+            y: { border: { display: false }, grid: { display: false }, ticks: { color: '#E2E8F0', font: { family: 'Sarabun' } } }
+          }
+        }
+      });
+    }
+
+    // 🍩 CHART 2: Doughnut Chart
+    function renderDoughnutChart(top5, total) {
+      const ctx = document.getElementById('doughnutChart').getContext('2d');
+      
+      const top5Total = top5.reduce((sum, d) => sum + d.count, 0);
+      const othersTotal = total - top5Total;
+      
+      const labels = [...top5.map(d => d.name.split(' ')[0]), 'เจ้าหน้าที่อื่นๆ'];
+      const dataValues = [...top5.map(d => d.count), othersTotal];
+      
+      // Color Palette: Gradients of Blue + Gray for 'Others'
+      const colors = [
+        '#0284C7', '#0EA5E9', '#38BDF8', '#7DD3FC', '#BAE6FD', '#334155'
+      ];
+
+      if (doughnutChart) doughnutChart.destroy();
+      doughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: dataValues,
+            backgroundColor: colors,
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#94A3B8', font: { family: 'Sarabun', size: 12 }, usePointStyle: true, padding: 15 }
+            },
+            tooltip: {
+              backgroundColor: '#0F172A', titleFont: { family: 'Sarabun' }, bodyFont: { family: 'Sarabun' },
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw;
+                  const pct = ((val / total) * 100).toFixed(1);
+                  return ` ${val} รายการ (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
     function updateTable(total) {
       const tbody = document.getElementById('dataTable');
       const avg = total / staffData.length;
@@ -304,7 +398,7 @@
         const barColor = isHighLoad ? 'background: #0EA5E9;' : 'background: #475569;';
         
         return `
-          <tr style="animation: fadeUp 0.3s ease forwards; opacity: 0; animation-delay: ${i * 0.05}s">
+          <tr>
             <td class="num-font text-slate-500 font-bold">${(i + 1).toString().padStart(2, '0')}</td>
             <td class="font-medium text-slate-200">${s.name}</td>
             <td class="text-right font-bold num-font text-white text-lg">${s.count}</td>
@@ -322,44 +416,6 @@
           </tr>
         `;
       }).join('');
-    }
-
-    function updateChart(data) {
-      const ctx = document.getElementById('topStaffChart').getContext('2d');
-      
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: data.map(d => d.name.split(' ')[0]), // เอาแค่ชื่อแรกเพื่อไม่ให้แกนรก
-          datasets: [{
-            data: data.map(d => d.count),
-            backgroundColor: '#0EA5E9',
-            hoverBackgroundColor: '#38BDF8',
-            borderRadius: 4,
-            barThickness: 32,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#0F172A',
-              titleFont: { family: 'Sarabun', size: 14 },
-              bodyFont: { family: 'Sarabun', size: 13 },
-              padding: 12,
-              displayColors: false,
-              callbacks: { label: c => `ปริมาณงาน: ${c.raw} รายการ` }
-            }
-          },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Sarabun' } } },
-            y: { border: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B', font: { family: 'Chakra Petch' } } }
-          }
-        }
-      });
     }
 
     function exportExcel() {
