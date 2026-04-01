@@ -1,35 +1,169 @@
-let chart = null;
+<!doctype html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแสดงข้อมูลการจ่ายงาน SUPPORTEWP</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-deep: #27ae60;
+      --green-mid: #2ecc71;
+      --green-light: #1abc9c;
+      --bg-dark: #0f0f0f;
+      --bg-card: #1a1a1a;
+      --border: rgba(255,255,255,0.07);
+      --text-bright: #ffffff;
+      --text-dim: #888888;
+    }
+    * { font-family: 'Sarabun', sans-serif; box-sizing: border-box; }
+    body { background: var(--bg-dark); color: var(--text-bright); min-height: 100vh; overflow-x: hidden; }
+
+    /* Ambient Background */
+    .ambient-blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .blob-1 { width: 600px; height: 600px; background: rgba(46,204,113,0.1); top: -200px; right: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: rgba(243,156,18,0.05); bottom: 100px; left: -100px; }
+
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 15, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px;
+      transition: all 0.3s ease; position: relative; overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--green-mid); }
+
+    .rank-badge { 
+      width: 32px; height: 32px; border-radius: 8px; 
+      display: inline-flex; align-items: center; justify-content: center; 
+      font-family: 'Chakra Petch', sans-serif; font-weight: 700;
+    }
+    .rank-1 { background: linear-gradient(135deg, #f1c40f, #d35400); color: #000; }
+    .rank-2 { background: #bdc3c7; color: #000; }
+    .rank-3 { background: #cd7f32; color: #fff; }
+    .rank-n { background: rgba(255,255,255,0.1); color: var(--text-dim); }
+
+    .progress-track { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.05); overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--green-mid); transition: width 1s ease-in-out; }
+
+    .pulse-green { background: #2ecc71; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46,204,113,0.4); } 70% { box-shadow: 0 0 0 10px rgba(46,204,113,0); } 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0); } }
+    
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .row-in { animation: fadeIn 0.5s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="p-0 m-0">
+  <div class="ambient-blob blob-1"></div>
+  <div class="ambient-blob blob-2"></div>
+
+  <header>
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-green-600 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-900/20">
+          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <h1 class="font-['Chakra_Petch'] text-xl font-bold tracking-tight text-white">SUPPORTEWP</h1>
+          <p class="text-xs text-gray-500 uppercase tracking-widest">กลุ่มงานพิจารณาอนุญาต 2</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="exportBtn" onclick="exportCSV()" disabled class="px-4 py-2 rounded-lg border border-yellow-600/30 text-yellow-500 text-sm font-semibold hover:bg-yellow-500/10 transition-all disabled:opacity-30">Export CSV</button>
+        <button id="fetchBtn" onclick="fetchData()" class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-green-900/20">
+          <svg id="fetchIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          ดึงข้อมูล
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="stat-card">
+        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Case ทั้งหมด</p>
+        <h2 id="totalCases" class="font-['Chakra_Petch'] text-4xl font-bold text-green-400">0</h2>
+      </div>
+      <div class="stat-card">
+        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">จำนวนเจ้าหน้าที่</p>
+        <h2 id="totalStaff" class="font-['Chakra_Petch'] text-4xl font-bold text-yellow-500">0</h2>
+      </div>
+      <div class="stat-card">
+        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">เฉลี่ย Case / คน</p>
+        <h2 id="avgCases" class="font-['Chakra_Petch'] text-4xl font-bold text-blue-400">0</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1 bg-[#1a1a1a] border border-white/5 rounded-2xl p-6 h-fit">
+        <h3 class="font-['Chakra_Petch'] font-bold text-gray-300 mb-6 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-green-500"></span> Top 5 ผลงานสูงสุด
+        </h3>
+        <div class="h-64">
+          <canvas id="topStaffChart"></canvas>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-bottom border-white/5 flex justify-between items-center bg-white/2">
+          <h3 class="font-['Chakra_Petch'] font-bold text-gray-300 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span> รายละเอียดการจ่ายงาน
+          </h3>
+          <div id="dataStatus" class="px-3 py-1 rounded-full bg-gray-800 text-[10px] text-gray-400 flex items-center gap-2">
+            <span id="timerNum" class="font-bold text-green-500">60</span>s จนกว่าจะรีเฟรช
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-black/20 text-[10px] uppercase tracking-widest text-gray-500">
+              <tr>
+                <th class="px-6 py-4">Rank</th>
+                <th class="px-6 py-4">เจ้าหน้าที่</th>
+                <th class="px-6 py-4 text-center">Case</th>
+                <th class="px-6 py-4">สัดส่วน</th>
+              </tr>
+            </thead>
+            <tbody id="dataTable" class="text-sm">
+              <tr>
+                <td colspan="4" class="px-6 py-20 text-center text-gray-600">กดปุ่มดึงข้อมูลเพื่อเริ่มระบบ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let chart = null;
     let staffData = [];
     let countdownInterval = null;
     let timeRemaining = 60;
 
-    // ตั้งค่า Sheet ID และ GID
     const SHEET_ID = '1ZCgi_egwYyQMnd33WjhW2g_KsFXzbkBajgj96Hn1U_g';
     const GID = '404719184';
 
     window.addEventListener('load', () => { fetchDataAuto(); });
 
-    function formatDateTimeThai() {
-      const now = new Date();
-      const year = now.getFullYear() + 543;
-      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      return `${now.getDate()} ${months[now.getMonth()]} ${year} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    }
-
     function startCountdown() {
       timeRemaining = 60;
       if (countdownInterval) clearInterval(countdownInterval);
-      const el = document.getElementById('timerNum');
-      
       countdownInterval = setInterval(() => {
         timeRemaining--;
-        if (el) {
-          el.textContent = timeRemaining;
-          el.className = 'timer-num' + (timeRemaining <= 10 ? ' timer-urgent' : '');
-        }
+        document.getElementById('timerNum').textContent = timeRemaining;
         if (timeRemaining <= 0) { 
-          clearInterval(countdownInterval); 
-          fetchDataAuto(); 
+          clearInterval(countdownInterval);
+          fetchDataAuto();
         }
       }, 1000);
     }
@@ -39,21 +173,12 @@ let chart = null;
       const icon = document.getElementById('fetchIcon');
       btn.disabled = true;
       icon.classList.add('spin');
-
+      
       try {
         await doFetch();
-        Swal.fire({ 
-          icon: 'success', 
-          title: 'อัปเดตข้อมูลสำเร็จ', 
-          text: `พบข้อมูลทั้งหมด ${staffData.reduce((s,d)=>s+d.count,0)} รายการ`,
-          timer: 1500, 
-          showConfirmButton: false, 
-          background: '#1a1a1a', 
-          color: '#fff' 
-        });
+        Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลแล้ว', timer: 1500, showConfirmButton: false, background: '#1a1a1a', color: '#fff' });
       } catch (e) {
-        console.error(e);
-        Swal.fire({ icon: 'error', title: 'การเชื่อมต่อผิดพลาด', text: 'ตรวจสอบการเปิด Public ของ Google Sheet', background: '#1a1a1a', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message, background: '#1a1a1a', color: '#fff' });
       } finally {
         btn.disabled = false;
         icon.classList.remove('spin');
@@ -62,42 +187,28 @@ let chart = null;
     }
 
     async function fetchDataAuto() {
-      try { 
-        await doFetch(); 
-        startCountdown(); 
-      } catch (e) { 
-        startCountdown(); 
-      }
+      try { await doFetch(); startCountdown(); } catch(e) { startCountdown(); }
     }
 
     async function doFetch() {
       const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
-      const res = await fetch(url);
-      const text = await res.text();
+      const response = await fetch(url);
+      const text = await response.text();
+      const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
       
-      // แปลงข้อมูลจาก Google JSON Format
-      const jsonStart = text.indexOf('{');
-      const jsonEnd = text.lastIndexOf('}');
-      const data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+      const rows = json.table.rows;
+      const cols = json.table.cols;
       
-      processData(data.table);
-      setStatusLive();
-    }
-
-    function processData(table) {
-      const rows = table.rows;
-      const cols = table.cols;
-      
-      // ค้นหาคอลัมน์ชื่อเจ้าหน้าที่แบบยืดหยุ่น
-      const staffKeywords = ['ชื่อเจ้าหน้าที่', 'เจ้าหน้าที่', 'staff', 'name', 'ชื่อ'];
-      let staffCol = cols.findIndex(c => staffKeywords.some(k => (c.label || '').toLowerCase().includes(k)));
-      if (staffCol === -1) staffCol = 0; // fallback คอลัมน์แรก
+      // ค้นหาคอลัมน์เจ้าหน้าที่อัตโนมัติ
+      const keywords = ['ชื่อ','เจ้าหน้าที่','staff','name'];
+      let staffCol = cols.findIndex(c => keywords.some(k => (c.label || '').toLowerCase().includes(k)));
+      if (staffCol === -1) staffCol = 0;
 
       const counts = {};
       rows.forEach(r => {
         if (r.c && r.c[staffCol]) {
-          const name = (r.c[staffCol].v || '').toString().trim();
-          if (name) counts[name] = (counts[name] || 0) + 1;
+          const val = (r.c[staffCol].v || '').toString().trim();
+          if (val) counts[val] = (counts[val] || 0) + 1;
         }
       });
 
@@ -105,17 +216,40 @@ let chart = null;
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count);
 
-      updateDashboard();
-      updateChart();
-      updateTable();
-      document.getElementById('exportBtn').disabled = staffData.length === 0;
+      updateUI();
     }
 
-    function updateDashboard() {
+    function updateUI() {
       const total = staffData.reduce((s, d) => s + d.count, 0);
+      
+      // Update Stats with Animation
       animateNumber('totalCases', total);
       animateNumber('totalStaff', staffData.length);
-      document.getElementById('avgCases').textContent = staffData.length ? (total / staffData.length).toFixed(1) : '—';
+      document.getElementById('avgCases').textContent = staffData.length ? (total/staffData.length).toFixed(1) : 0;
+      document.getElementById('exportBtn').disabled = staffData.length === 0;
+
+      // Update Table
+      const tbody = document.getElementById('dataTable');
+      tbody.innerHTML = staffData.map((s, i) => {
+        const pct = ((s.count / total) * 100).toFixed(1);
+        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+        return `
+          <tr class="row-in border-b border-white/5 hover:bg-white/5 transition-colors">
+            <td class="px-6 py-4"><div class="rank-badge ${rankClass}">${i + 1}</div></td>
+            <td class="px-6 py-4 font-medium">${s.name}</td>
+            <td class="px-6 py-4 text-center font-['Chakra_Petch'] font-bold text-green-400">${s.count}</td>
+            <td class="px-6 py-4 w-48">
+              <div class="flex items-center gap-3">
+                <div class="progress-track"><div class="progress-fill" style="width: ${pct}%"></div></div>
+                <span class="text-[10px] text-gray-500 font-bold">${pct}%</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Update Chart
+      updateChart(staffData.slice(0, 5));
     }
 
     function animateNumber(id, target) {
@@ -123,87 +257,53 @@ let chart = null;
       let start = 0;
       const duration = 1000;
       const startTime = performance.now();
-
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const current = Math.floor(progress * target);
-        el.textContent = current.toLocaleString();
-        if (progress < 1) requestAnimationFrame(update);
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        el.textContent = Math.floor(progress * target).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
       }
-      requestAnimationFrame(update);
+      requestAnimationFrame(step);
     }
 
-    function updateTable() {
-      const tbody = document.getElementById('dataTable');
-      const total = staffData.reduce((s, d) => s + d.count, 0);
-      
-      tbody.innerHTML = staffData.map((s, i) => {
-        const pct = total ? ((s.count / total) * 100).toFixed(1) : 0;
-        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
-        return `
-          <tr class="row-in" style="animation-delay: ${i * 0.05}s">
-            <td><div class="rank-badge ${rankClass}">${i + 1}</div></td>
-            <td class="font-medium">${s.name}</td>
-            <td class="center"><span class="case-pill">${s.count}</span></td>
-            <td>
-              <div class="progress-wrap">
-                <div class="progress-track"><div class="progress-fill" style="width: ${pct}%"></div></div>
-                <span class="progress-pct">${pct}%</span>
-              </div>
-            </td>
-            <td><span class="chip ${s.count > (total/staffData.length) ? 'chip-high' : 'chip-ok'}">Active</span></td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function updateChart() {
+    function updateChart(data) {
       const ctx = document.getElementById('topStaffChart').getContext('2d');
-      const top5 = staffData.slice(0, 5);
-      
       if (chart) chart.destroy();
-
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: top5.map(s => s.name),
+          labels: data.map(d => d.name),
           datasets: [{
-            label: 'จำนวน Case',
-            data: top5.map(s => s.count),
+            data: data.map(d => d.count),
             backgroundColor: '#2ecc71',
-            borderRadius: 8,
-            barThickness: 30
+            borderRadius: 6,
+            barThickness: 20
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
-            x: { ticks: { color: '#ccc' } }
+            x: { display: false },
+            y: { ticks: { color: '#888', font: { family: 'Sarabun' } }, grid: { display: false } }
           }
         }
       });
     }
 
-    function setStatusLive() {
-      const dt = formatDateTimeThai();
-      const statusEl = document.getElementById('dataStatus');
-      statusEl.className = 'status-pill status-live';
-      statusEl.innerHTML = `<span class="pulse-dot pulse-green"></span> ${dt}`;
-    }
-
     function exportCSV() {
-      let csv = '\uFEFFชื่อเจ้าหน้าที่,จำนวน Case,สัดส่วน%\n';
+      let csv = '\uFEFFRank,Name,Cases,Percent\n';
       const total = staffData.reduce((s,d)=>s+d.count,0);
-      staffData.forEach(s => {
-        csv += `${s.name},${s.count},${((s.count/total)*100).toFixed(1)}\n`;
+      staffData.forEach((s, i) => {
+        csv += `${i+1},${s.name},${s.count},${((s.count/total)*100).toFixed(1)}%\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `Report_EWP_${new Date().getTime()}.csv`;
+      link.download = `SupportEWP_Report_${new Date().toISOString().slice(0,10)}.csv`;
       link.click();
     }
+  </script>
+</body>
+</html>
