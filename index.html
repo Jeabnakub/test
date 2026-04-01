@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SUPPORTEWP | Executive Dashboard</title>
+  <title>SUPPORTEWP | Executive Presentation</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,246 +11,174 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --brand-primary: #10b981;
-      --brand-secondary: #34d399;
-      --bg-main: #0a0c10;
-      --bg-surface: #111827;
-      --bg-sub: #1f2937;
-      --text-main: #f9fafb;
-      --text-sub: #9ca3af;
-      --border-color: rgba(255, 255, 255, 0.05);
+      --bg-dark: #0B1120; /* Deep Navy */
+      --surface: #1E293B; /* Slate 800 */
+      --surface-light: #334155; /* Slate 700 */
+      --accent-blue: #0EA5E9; /* Sky 500 */
+      --accent-green: #10B981; /* Emerald 500 */
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border-subtle: rgba(255, 255, 255, 0.06);
     }
     
     * { font-family: 'Sarabun', sans-serif; -webkit-font-smoothing: antialiased; }
-    h1, h2, h3, .num-font { font-family: 'Chakra Petch', sans-serif; }
+    .num-font { font-family: 'Chakra Petch', sans-serif; }
 
     body {
-      background-color: var(--bg-main);
+      background-color: var(--bg-dark);
       color: var(--text-main);
-      background-image: 
-        radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.08), transparent),
-        radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.03), transparent);
-      background-attachment: fixed;
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%);
+      background-repeat: no-repeat;
     }
 
-    /* Glassmorphism Components */
-    .glass-card {
-      background: rgba(17, 24, 39, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      border-radius: 1.25rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Corporate Card */
+    .corp-card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .glass-card:hover {
-      border-color: rgba(16, 185, 129, 0.3);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-main); }
-    ::-webkit-scrollbar-thumb { background: var(--bg-sub); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--brand-primary); }
-
-    /* Button Styling */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--brand-primary) 0%, #059669 100%);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    .corp-card:hover {
+      background: rgba(30, 41, 59, 0.6);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
     }
 
-    /* Table Styling */
-    .custom-table thead th {
-      background: rgba(31, 41, 55, 0.5);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      padding: 1rem 1.5rem;
-    }
-    .custom-table tbody td {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
+    /* Typography Hierarchy */
+    .kpi-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .kpi-value { font-size: 3.5rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
 
-    /* Status Indicator */
-    .indicator-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      display: inline-block; position: relative;
+    /* Button Professional */
+    .btn-sync {
+      background: var(--surface-light); color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s;
     }
-    .dot-online { background: var(--brand-primary); box-shadow: 0 0 10px var(--brand-primary); }
-    .dot-pulse::after {
-      content: ''; position: absolute; inset: 0; border-radius: 50%;
-      background: var(--brand-primary); animation: pulse-anim 2s infinite;
+    .btn-sync:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+    /* Clean Table */
+    .clean-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .clean-table th {
+      color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.1em; padding: 0 16px 8px; border-bottom: 1px solid var(--border-subtle);
     }
-    @keyframes pulse-anim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
-
-    /* Counter Animation */
-    .stat-value { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; }
-
-    .chart-container { height: 320px; position: relative; }
-
-    /* Loader */
-    .loader-ring {
-      width: 40px; height: 40px; border: 3px solid rgba(16, 185, 129, 0.1);
-      border-top-color: var(--brand-primary); border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    .clean-table td {
+      background: rgba(255,255,255,0.02); padding: 16px;
+      border-top: 1px solid transparent; border-bottom: 1px solid transparent;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .clean-table td:first-child { border-left: 1px solid transparent; border-radius: 8px 0 0 8px; }
+    .clean-table td:last-child { border-right: 1px solid transparent; border-radius: 0 8px 8px 0; }
+    .clean-table tbody tr:hover td { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.05); }
+
+    /* Data Bar */
+    .data-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+    .data-bar-fill { height: 100%; background: var(--accent-blue); border-radius: 4px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); display: inline-block; }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-  <nav class="sticky top-0 z-50 border-b border-white/5 bg-gray-900/80 backdrop-blur-xl">
-    <div class="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-          <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold text-white leading-none">SUPPORTEWP</h1>
-          <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-[0.2em] mt-1">Analytics Division 2</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div id="updateTag" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-gray-400">
-          <span class="indicator-dot dot-online dot-pulse"></span>
-          <span id="lastUpdate">Ready to sync</span>
-        </div>
-        <button id="exportExcelBtn" onclick="exportExcel()" disabled class="px-4 py-2 text-sm font-semibold text-emerald-500 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/5 disabled:opacity-30 transition-all">
-          Export Report
-        </button>
-        <button id="fetchBtn" onclick="fetchData()" class="btn-primary px-5 py-2 rounded-lg text-sm font-bold text-white flex items-center gap-2">
-          <svg id="fetchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          Sync Data
-        </button>
+  <header class="w-full px-8 py-6 flex items-center justify-between z-10">
+    <div class="flex items-center gap-4">
+      <div class="w-2 h-8 bg-sky-500 rounded-full"></div>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white num-font">SUPPORTEWP <span class="text-sky-400">ANALYTICS</span></h1>
+        <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Employment Administration Division 2</p>
       </div>
     </div>
-  </nav>
+    <div class="flex items-center gap-6">
+      <div class="text-right hidden md:block">
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">System Status</p>
+        <div class="flex items-center gap-2 text-sm font-medium">
+          <span class="status-dot"></span> <span id="lastUpdate">Live Connected</span>
+        </div>
+      </div>
+      <button id="fetchBtn" onclick="fetchData()" class="btn-sync flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm">
+        <svg id="fetchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Sync Database
+      </button>
+      <button onclick="exportExcel()" id="exportBtn" disabled class="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="Export to Excel">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </button>
+    </div>
+  </header>
 
-  <main class="max-w-[1600px] mx-auto px-6 py-8">
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-8 pb-12 flex flex-col gap-8">
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="glass-card p-6">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-sm text-gray-400 font-medium mb-1">Total Case Load</p>
-            <div id="totalCases" class="stat-value text-white num-font">0</div>
-          </div>
-          <div class="p-3 bg-emerald-500/10 rounded-lg text-emerald-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center text-xs text-emerald-500 font-bold">
-          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"/></svg>
-          Real-time processed
-        </div>
+    <div class="corp-card p-6 flex items-start gap-4 animate-in" style="animation-delay: 0.1s; border-left: 4px solid var(--accent-blue);">
+      <div class="p-3 bg-sky-500/10 rounded-xl text-sky-400 shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
-
-      <div class="glass-card p-6">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-sm text-gray-400 font-medium mb-1">Active Staff</p>
-            <div id="totalStaff" class="stat-value text-amber-400 num-font">0</div>
-          </div>
-          <div class="p-3 bg-amber-500/10 rounded-lg text-amber-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center text-xs text-gray-500">On-duty personnel</div>
-      </div>
-
-      <div class="glass-card p-6">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-sm text-gray-400 font-medium mb-1">Avg. Distribution</p>
-            <div id="avgCases" class="stat-value text-blue-400 num-font">0</div>
-          </div>
-          <div class="p-3 bg-blue-500/10 rounded-lg text-blue-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center text-xs text-gray-500">Case per officer</div>
-      </div>
-
-      <div class="glass-card p-6">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-sm text-gray-400 font-medium mb-1">Next Sync In</p>
-            <div id="timerNum" class="stat-value text-white num-font">60</div>
-          </div>
-          <div class="p-3 bg-white/5 rounded-lg text-gray-400">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center text-xs text-gray-500">Automatic refresh cycle</div>
+      <div>
+        <h3 class="text-sm font-bold text-slate-300 mb-1">Executive Insight</h3>
+        <p id="insightText" class="text-lg text-white font-medium leading-relaxed">กำลังดึงข้อมูลเพื่อสรุปผลการดำเนินงานล่าสุด...</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-      
-      <div class="glass-card xl:col-span-1 p-6">
-        <div class="flex items-center justify-between mb-8">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span class="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
-            Performance Top 5
-          </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="corp-card p-8 animate-in" style="animation-delay: 0.2s;">
+        <p class="kpi-title mb-2">Total Case Volume</p>
+        <div class="flex items-end gap-3">
+          <div id="totalCases" class="kpi-value num-font text-white">0</div>
+          <div class="pb-2 text-slate-400 font-medium">Cases</div>
         </div>
-        <div class="chart-container">
+      </div>
+      <div class="corp-card p-8 animate-in" style="animation-delay: 0.3s;">
+        <p class="kpi-title mb-2">Active Personnel</p>
+        <div class="flex items-end gap-3">
+          <div id="totalStaff" class="kpi-value num-font text-sky-400">0</div>
+          <div class="pb-2 text-slate-400 font-medium">Officers</div>
+        </div>
+      </div>
+      <div class="corp-card p-8 animate-in" style="animation-delay: 0.4s;">
+        <p class="kpi-title mb-2 flex items-center justify-between">
+          <span>Auto Refresh</span>
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </p>
+        <div class="flex items-end gap-3">
+          <div id="timerNum" class="kpi-value num-font text-emerald-400">60</div>
+          <div class="pb-2 text-slate-400 font-medium">Secs</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 animate-in" style="animation-delay: 0.5s;">
+      
+      <div class="corp-card p-8 xl:col-span-1 flex flex-col">
+        <h2 class="text-base font-bold text-white mb-6">Top 5 Workload Distribution</h2>
+        <div class="flex-1 relative min-h-[300px]">
           <canvas id="topStaffChart"></canvas>
         </div>
       </div>
 
-      <div class="glass-card xl:col-span-2 overflow-hidden">
-        <div class="p-6 border-b border-white/5 bg-white/2 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-white">Case Distribution Details</h3>
-          <div class="flex gap-2">
-            <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider">High Load</span>
-            <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-bold uppercase tracking-wider">Optimal</span>
-          </div>
+      <div class="corp-card p-8 xl:col-span-2 overflow-x-auto">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-base font-bold text-white">Resource Allocation Matrix</h2>
+          <span class="px-3 py-1 rounded bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">Sorted by Volume</span>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full custom-table">
-            <thead>
-              <tr>
-                <th class="w-20">Rank</th>
-                <th>Staff Name</th>
-                <th class="text-center">Cases</th>
-                <th class="w-48">Efficiency Index</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="dataTable">
-              <tr>
-                <td colspan="5" class="py-24 text-center">
-                  <div class="flex flex-col items-center gap-3 opacity-30">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                    <p class="text-sm font-medium">No data synced. Click "Sync Data" to begin.</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="clean-table text-left">
+          <thead>
+            <tr>
+              <th class="w-16">Rank</th>
+              <th>Officer Name</th>
+              <th class="w-32 text-right">Assigned</th>
+              <th class="w-48 pl-8">Capacity Load</th>
+              <th class="w-32 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable">
+            <tr><td colspan="5" class="text-center py-12 text-slate-500">รอการเชื่อมต่อข้อมูล...</td></tr>
+          </tbody>
+        </table>
       </div>
 
     </div>
-
-    <footer class="mt-12 py-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-gray-500 text-xs">
-      <p>© 2026 SUPPORTEWP System · Employment Division 2</p>
-      <div class="flex items-center gap-6 mt-4 md:mt-0">
-        <a href="#" class="hover:text-emerald-500 transition-colors">Data Privacy</a>
-        <a href="#" class="hover:text-emerald-500 transition-colors">System Status</a>
-        <a href="#" class="hover:text-emerald-500 transition-colors">v2.5.0-Enterprise</a>
-      </div>
-    </footer>
   </main>
 
   <script>
@@ -264,43 +192,20 @@
 
     window.addEventListener('load', () => { fetchDataAuto(); });
 
-    // ✅ Professional Loader
-    function showLoading() {
-      const modal = document.createElement('div');
-      modal.id = 'proLoader';
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(5,7,10,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:all 0.4s ease;';
-      modal.innerHTML = `
-        <div class="flex flex-col items-center gap-5">
-          <div class="loader-ring"></div>
-          <div class="flex flex-col items-center">
-            <span class="text-emerald-500 font-bold tracking-widest text-[10px] uppercase">Syncing Database</span>
-            <span class="text-white/50 text-xs mt-1">Fetching records from secure server...</span>
-          </div>
-        </div>`;
-      document.body.appendChild(modal);
-      setTimeout(() => modal.style.opacity = '1', 10);
-    }
-
-    function hideLoading() {
-      const modal = document.getElementById('proLoader');
-      if(modal) { modal.style.opacity = '0'; setTimeout(() => modal.remove(), 400); }
-    }
-
     async function fetchData() {
       const btn = document.getElementById('fetchBtn');
       const icon = document.getElementById('fetchIcon');
-      btn.disabled = true; icon.classList.add('spin');
-      showLoading();
+      btn.disabled = true; 
+      icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>`;
+      icon.classList.add('animate-spin');
       
       try {
         await doFetch();
-        hideLoading();
-        Swal.fire({ icon: 'success', title: 'Data Synchronized', text:`Successfully processed ${staffData.length} active records.`, background: '#111827', color: '#fff', confirmButtonColor: '#10b981', timer: 2000 });
       } catch (e) {
-        hideLoading();
-        Swal.fire({ icon: 'error', title: 'Sync Failed', text: 'Cloud connection timeout. Please check your network.', background: '#111827', color: '#fff', confirmButtonColor: '#10b981' });
+        Swal.fire({ icon: 'error', title: 'Data Source Error', text: 'ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบการเชื่อมต่อ', background: '#1E293B', color: '#fff' });
       } finally {
-        btn.disabled = false; icon.classList.remove('spin');
+        btn.disabled = false; 
+        icon.classList.remove('animate-spin');
         startCountdown();
       }
     }
@@ -334,33 +239,44 @@
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count);
 
-      updateStats();
-      updateChart(staffData.slice(0, 5));
-      updateTable();
+      updateDashboard();
     }
 
-    function updateStats() {
+    function updateDashboard() {
       const total = staffData.reduce((s, d) => s + d.count, 0);
-      animateValue('totalCases', total);
-      animateValue('totalStaff', staffData.length);
-      document.getElementById('avgCases').textContent = staffData.length ? (total/staffData.length).toFixed(1) : '0.0';
-      document.getElementById('exportExcelBtn').disabled = staffData.length === 0;
+      animateNumber('totalCases', total);
+      animateNumber('totalStaff', staffData.length);
+      document.getElementById('exportBtn').disabled = staffData.length === 0;
 
       const now = new Date();
-      document.getElementById('lastUpdate').textContent = `Synced at ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-      document.getElementById('updateTag').classList.remove('hidden');
+      document.getElementById('lastUpdate').textContent = `Synced: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+      updateSmartInsights(total);
+      updateChart(staffData.slice(0, 5));
+      updateTable(total);
     }
 
-    function animateValue(id, target) {
+    function updateSmartInsights(total) {
+      if(staffData.length === 0) return;
+      const top = staffData[0];
+      const avg = Math.round(total / staffData.length);
+      const text = `ภาพรวมขณะนี้ มีเจ้าหน้าที่หมุนเวียน <b>${staffData.length} ท่าน</b> จัดการเอกสารรวม <b>${total.toLocaleString()} รายการ</b> (เฉลี่ย ${avg} งาน/ท่าน) โดยผู้ที่รับผิดชอบโหลดงานสูงสุดคือ <b>คุณ${top.name}</b> (${top.count} รายการ)`;
+      
+      const insightEl = document.getElementById('insightText');
+      insightEl.innerHTML = text;
+      // แอนิเมชันกระพริบเบาๆ ให้รู้ว่าข้อมูลอัปเดตแล้ว
+      insightEl.style.opacity = '0.5';
+      setTimeout(() => insightEl.style.opacity = '1', 200);
+    }
+
+    function animateNumber(id, target) {
       const obj = document.getElementById(id);
       let start = 0;
-      const duration = 1500;
+      const duration = 1000;
       const startTime = performance.now();
-      
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 4);
+      function update(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
         obj.textContent = Math.floor(ease * target).toLocaleString();
         if (progress < 1) requestAnimationFrame(update);
       }
@@ -377,32 +293,30 @@
       }, 1000);
     }
 
-    function updateTable() {
+    function updateTable(total) {
       const tbody = document.getElementById('dataTable');
-      const total = staffData.reduce((s, d) => s + d.count, 0);
       const avg = total / staffData.length;
 
       tbody.innerHTML = staffData.map((s, i) => {
         const pct = ((s.count / total) * 100).toFixed(1);
-        const isTop = i < 3;
-        const statusColor = s.count > avg * 1.2 ? 'text-emerald-400 bg-emerald-400/10' : 'text-blue-400 bg-blue-400/10';
+        const isHighLoad = s.count > avg * 1.2;
+        const statusColor = isHighLoad ? 'text-sky-400 bg-sky-400/10' : 'text-slate-300 bg-slate-700/50';
+        const barColor = isHighLoad ? 'background: #0EA5E9;' : 'background: #475569;';
         
         return `
-          <tr class="hover:bg-white/[0.02] transition-colors duration-200">
-            <td class="num-font text-gray-500 font-bold">${(i + 1).toString().padStart(2, '0')}</td>
-            <td class="font-medium text-white">${s.name}</td>
-            <td class="text-center font-bold num-font text-emerald-400">${s.count}</td>
-            <td>
+          <tr style="animation: fadeUp 0.3s ease forwards; opacity: 0; animation-delay: ${i * 0.05}s">
+            <td class="num-font text-slate-500 font-bold">${(i + 1).toString().padStart(2, '0')}</td>
+            <td class="font-medium text-slate-200">${s.name}</td>
+            <td class="text-right font-bold num-font text-white text-lg">${s.count}</td>
+            <td class="pl-8">
               <div class="flex items-center gap-3">
-                <div class="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-emerald-500 rounded-full" style="width: ${pct}%"></div>
-                </div>
-                <span class="text-[10px] text-gray-400 num-font w-8">${pct}%</span>
+                <div class="data-bar-bg"><div class="data-bar-fill" style="width: ${pct}%; ${barColor}"></div></div>
+                <span class="text-[11px] text-slate-400 num-font w-8 text-right">${pct}%</span>
               </div>
             </td>
-            <td>
-              <span class="px-2 py-1 rounded-md text-[10px] font-bold ${statusColor}">
-                ${s.count > avg * 1.2 ? 'Peak Performance' : 'Active'}
+            <td class="text-center">
+              <span class="px-2.5 py-1 rounded text-[11px] font-bold tracking-wide ${statusColor}">
+                ${isHighLoad ? 'HIGH LOAD' : 'NOMINAL'}
               </span>
             </td>
           </tr>
@@ -412,58 +326,54 @@
 
     function updateChart(data) {
       const ctx = document.getElementById('topStaffChart').getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
+      
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: data.map(d => d.name),
+          labels: data.map(d => d.name.split(' ')[0]), // เอาแค่ชื่อแรกเพื่อไม่ให้แกนรก
           datasets: [{
             data: data.map(d => d.count),
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-            hoverBackgroundColor: '#10b981',
-            borderRadius: 6,
-            barThickness: 24,
+            backgroundColor: '#0EA5E9',
+            hoverBackgroundColor: '#38BDF8',
+            borderRadius: 4,
+            barThickness: 32,
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#1f2937',
+              backgroundColor: '#0F172A',
+              titleFont: { family: 'Sarabun', size: 14 },
+              bodyFont: { family: 'Sarabun', size: 13 },
               padding: 12,
-              titleFont: { size: 12, weight: 'bold' },
-              bodyFont: { size: 11 },
-              cornerRadius: 8,
-              borderColor: 'rgba(255,255,255,0.1)',
-              borderWidth: 1
+              displayColors: false,
+              callbacks: { label: c => `ปริมาณงาน: ${c.raw} รายการ` }
             }
           },
           scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280', font: { size: 10 } } },
-            y: { grid: { display: false }, ticks: { color: '#f3f4f6', font: { size: 11 } } }
+            x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Sarabun' } } },
+            y: { border: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B', font: { family: 'Chakra Petch' } } }
           }
         }
       });
     }
 
     function exportExcel() {
+      const total = staffData.reduce((s, d) => s + d.count, 0);
       const data = staffData.map((s, i) => ({
         "Rank": i + 1,
         "Officer Name": s.name,
-        "Total Cases": s.count,
-        "Workload (%)": ((s.count / staffData.reduce((a,b)=>a+b.count,0)) * 100).toFixed(1)
+        "Cases Handled": s.count,
+        "Percentage": ((s.count / total) * 100).toFixed(2) + '%'
       }));
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Workload Report");
-      XLSX.writeFile(wb, `EWP_Report_${new Date().getTime()}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, "Analytics Report");
+      XLSX.writeFile(wb, `EWP_Executive_Report_${new Date().getTime()}.xlsx`);
     }
   </script>
 </body>
