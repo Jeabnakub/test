@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบแสดงข้อมูลการจ่ายงาน SUPPORTEWP</title>
+  <title>SUPPORTEWP | Executive Dashboard</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,334 +11,228 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --red-deep: #27ae60;
-      --red-mid: #2ecc71;
-      --red-light: #1abc9c;
-      --red-glow: rgba(46, 204, 113, 0.25);
-      --gold: #f39c12;
-      --gold-light: #f1c40f;
-      --bg-dark: #0f0f0f;
-      --bg-card: #1a1a1a;
-      --bg-card2: #222222;
-      --border: rgba(255,255,255,0.07);
-      --text-bright: #ffffff;
-      --text-mid: #cccccc;
-      --text-dim: #888888;
+      --brand-primary: #10b981;
+      --brand-secondary: #34d399;
+      --bg-main: #0a0c10;
+      --bg-surface: #111827;
+      --bg-sub: #1f2937;
+      --text-main: #f9fafb;
+      --text-sub: #9ca3af;
+      --border-color: rgba(255, 255, 255, 0.05);
     }
-    * { font-family: 'Sarabun', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg-dark); color: var(--text-bright); min-height: 100vh; overflow-x: hidden; }
+    
+    * { font-family: 'Sarabun', sans-serif; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, .num-font { font-family: 'Chakra Petch', sans-serif; }
 
-    /* Cinematic Background Noise & Gradient */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      opacity: 0.4;
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      background-image: 
+        radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.08), transparent),
+        radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.03), transparent);
+      background-attachment: fixed;
     }
 
-    /* Ambient Blobs */
-    .ambient-blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-    .blob-1 { width: 600px; height: 600px; background: rgba(46,204,113,0.12); top: -200px; right: -100px; }
-    .blob-2 { width: 400px; height: 400px; background: rgba(243,156,18,0.06); bottom: 100px; left: -100px; }
-
-    /* Glass Header with Trace Glow */
-    header {
-      position: relative; z-index: 10;
-      background: linear-gradient(180deg, rgba(15,70,35,0.98) 0%, rgba(10,50,25,0.95) 100%);
-      border-bottom: 1px solid rgba(46,204,113,0.3);
-      box-shadow: 0 1px 0 rgba(46,204,113,0.2), 0 20px 60px rgba(0,0,0,0.5);
-      backdrop-filter: blur(20px);
+    /* Glassmorphism Components */
+    .glass-card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .header-inner { max-width: 1400px; margin: 0 auto; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-
-    .logo-box {
-      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-light) 100%);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 20px rgba(46,204,113,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
     }
 
-    .header-title {
-      font-family: 'Chakra Petch', sans-serif;
-      font-size: 1.25rem; font-weight: 700; letter-spacing: 0.03em;
-      background: linear-gradient(90deg, #fff 0%, #b0ffb0 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-sub); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--brand-primary); }
+
+    /* Button Styling */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand-primary) 0%, #059669 100%);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
-    .header-sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; letter-spacing: 0.08em; text-transform: uppercase; }
-
-    /* Fetch Button Neon */
-    .fetch-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 22px; border-radius: 10px; border: none; cursor: pointer;
-      font-family: 'Sarabun', sans-serif; font-size: 0.95rem; font-weight: 600;
-      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-mid) 100%);
-      color: white; transition: all 0.25s ease;
-      box-shadow: 0 4px 20px rgba(46,204,113,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
-      position: relative; overflow: hidden;
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
     }
-    .fetch-btn::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.2s;
+
+    /* Table Styling */
+    .custom-table thead th {
+      background: rgba(31, 41, 55, 0.5);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      padding: 1rem 1.5rem;
     }
-    .fetch-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(46,204,113,0.5); }
-    .fetch-btn:hover::after { opacity: 1; }
-    .fetch-btn:active { transform: translateY(0); }
-    .fetch-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    /* Export Excel Modern */
-    .export-excel-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 10px; cursor: pointer;
-      font-family: 'Sarabun', sans-serif; font-size: 0.9rem; font-weight: 600;
-      background: transparent;
-      color: #f1c40f;
-      border: 1px solid rgba(241,196,15,0.35);
-      transition: all 0.25s ease;
+    .custom-table tbody td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
     }
-    .export-excel-btn:hover { background: rgba(241,196,15,0.1); border-color: rgba(241,196,15,0.6); transform: translateY(-2px); }
-    .export-excel-btn:active { transform: translateY(0); }
-    .export-excel-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    main { max-width: 1400px; margin: 0 auto; padding: 32px; position: relative; z-index: 1; }
-
-    /* Stats Grid & Glowing Cards */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-    @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
-
-    .stat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative; overflow: hidden;
+    /* Status Indicator */
+    .indicator-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; position: relative;
     }
-    .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: 18px; opacity: 0; transition: opacity 0.3s; }
-    .stat-card:hover { transform: translateY(-3px); border-color: rgba(46,204,113,0.3); }
-    .stat-card:hover::before { opacity: 1; }
-    .stat-card-1::before { background: linear-gradient(135deg, rgba(46,204,113,0.08) 0%, transparent 60%); }
-    .stat-card-2::before { background: linear-gradient(135deg, rgba(243,156,18,0.08) 0%, transparent 60%); }
-    .stat-card-3::before { background: linear-gradient(135deg, rgba(52,152,219,0.08) 0%, transparent 60%); }
-
-    .stat-label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-    .stat-value { font-family: 'Chakra Petch', sans-serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
-    .stat-value-1 { color: var(--red-light); }
-    .stat-value-2 { color: var(--gold-light); }
-    .stat-value-3 { color: #5dade2; }
-
-    .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .stat-icon-1 { background: rgba(46,204,113,0.15); }
-    .stat-icon-2 { background: rgba(243,156,18,0.15); }
-    .stat-icon-3 { background: rgba(52,152,219,0.15); }
-
-    /* Top Trace Glow */
-    .stat-card::after { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; border-radius: 0 0 4px 4px; }
-    .stat-card-1::after { background: linear-gradient(90deg, transparent, var(--red-mid), transparent); }
-    .stat-card-2::after { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-    .stat-card-3::after { background: linear-gradient(90deg, transparent, #5dade2, transparent); }
-
-    /* Panels & Table */
-    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .panel-header {
-      padding: 20px 28px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+    .dot-online { background: var(--brand-primary); box-shadow: 0 0 10px var(--brand-primary); }
+    .dot-pulse::after {
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
+      background: var(--brand-primary); animation: pulse-anim 2s infinite;
     }
-    .panel-title {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 1rem; font-weight: 600; color: var(--text-bright);
-      font-family: 'Chakra Petch', sans-serif; letter-spacing: 0.03em;
+    @keyframes pulse-anim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
+
+    /* Counter Animation */
+    .stat-value { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    .chart-container { height: 320px; position: relative; }
+
+    /* Loader */
+    .loader-ring {
+      width: 40px; height: 40px; border: 3px solid rgba(16, 185, 129, 0.1);
+      border-top-color: var(--brand-primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
-    .panel-title-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-    /* Status Pill */
-    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; }
-    .status-live { background: rgba(46,204,113,0.12); color: #2ecc71; border: 1px solid rgba(46,204,113,0.2); }
-    .status-wait { background: rgba(136,136,136,0.1); color: var(--text-dim); border: 1px solid rgba(136,136,136,0.15); }
-    .status-error { background: rgba(231,76,60,0.12); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
-
-    .pulse-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
-    .pulse-green { background: #2ecc71; animation: pulse-glow-green 2s infinite; }
-    .pulse-gray { background: #888; }
-    .pulse-red { background: #e74c3c; animation: pulse-glow-red 2s infinite; }
-    @keyframes pulse-glow-green { 0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,0.5)} 50%{box-shadow:0 0 0 5px rgba(46,204,113,0)} }
-    @keyframes pulse-glow-red { 0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.5)} 50%{box-shadow:0 0 0 5px rgba(231,76,60,0)} }
-
-    /* Timer Badge */
-    .timer-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-dim); }
-    .timer-num {
-      font-family: 'Chakra Petch', sans-serif; font-size: 0.9rem; font-weight: 700;
-      min-width: 28px; text-align: center;
-      background: rgba(255,255,255,0.06); border-radius: 6px; padding: 2px 6px;
-      color: var(--text-mid); transition: color 0.3s, background 0.3s;
-    }
-    .timer-urgent { color: #2ecc71 !important; background: rgba(46,204,113,0.15) !important; }
-
-    /* Chart Glowing Canvas */
-    .chart-wrap { padding: 24px 28px; }
-    .chart-inner { position: relative; height: 260px; }
-    canvas#topStaffChart { filter: drop-shadow(0px 0px 8px rgba(46, 204, 113, 0.2)); }
-
-    /* Modern Table */
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: rgba(255,255,255,0.03); }
-    th { padding: 13px 20px; text-align: left; font-size: 0.72rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; border-bottom: 1px solid var(--border); }
-    th.center { text-align: center; }
-    td { padding: 14px 20px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
-    tbody tr { transition: background 0.2s; }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
-    tbody tr:last-child td { border-bottom: none; }
-
-    /* Rank Badge Modern */
-    .rank-badge { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-family: 'Chakra Petch', sans-serif; font-size: 0.85rem; font-weight: 700; }
-    .rank-1 { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #000; box-shadow: 0 4px 12px rgba(46,204,113,0.4); }
-    .rank-2 { background: linear-gradient(135deg, #bdc3c7, #ecf0f1); color: #000; box-shadow: 0 4px 12px rgba(189,195,199,0.3); }
-    .rank-3 { background: linear-gradient(135deg, #1abc9c, #16a085); color: #fff; box-shadow: 0 4px 12px rgba(26,188,156,0.3); }
-    .rank-n { background: rgba(255,255,255,0.06); color: var(--text-dim); }
-
-    /* Case Pill Futuristic */
-    .case-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 4px 12px; border-radius: 8px; font-family: 'Chakra Petch', sans-serif; font-size: 1rem; font-weight: 700; background: rgba(46,204,113,0.15); color: var(--red-light); border: 1px solid rgba(46,204,113,0.2); }
-
-    /* Progress Tracker Neon */
-    .progress-wrap { display: flex; align-items: center; gap: 10px; }
-    .progress-track { flex: 1; max-width: 100px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); }
-    .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--red-deep), var(--red-light)); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .progress-pct { font-size: 0.8rem; color: var(--text-dim); font-family: 'Chakra Petch', sans-serif; min-width: 42px; }
-
-    /* Chip Modern */
-    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
-    .chip-high { background: rgba(46,204,113,0.12); color: #55efc4; border: 1px solid rgba(46,204,113,0.2); }
-    .chip-low  { background: rgba(243,156,18,0.12); color: #ffd54f; border: 1px solid rgba(243,156,18,0.2); }
-    .chip-ok   { background: rgba(52,152,219,0.12); color: #82c4f8; border: 1px solid rgba(52,152,219,0.2); }
-
-    .empty-state { padding: 64px 20px; text-align: center; color: var(--text-dim); }
-    .empty-state svg { margin: 0 auto 16px; opacity: 0.25; }
-    .empty-state p { font-size: 0.9rem; }
-
-    footer { text-align: center; padding: 28px 0; color: var(--text-dim); font-size: 0.78rem; letter-spacing: 0.05em; }
-
-    /* Animations & Utilities */
-    .spin { animation: spin 0.8s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .row-in { animation: fadeInSlideUp 0.35s ease-out both; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body>
-  <div class="ambient-blob blob-1"></div>
-  <div class="ambient-blob blob-2"></div>
+<body class="min-h-screen">
 
-  <header>
-    <div class="header-inner">
-      <div style="display:flex;align-items:center;gap:16px">
-        <div class="logo-box">
-          <svg width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  <nav class="sticky top-0 z-50 border-b border-white/5 bg-gray-900/80 backdrop-blur-xl">
+    <div class="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+          <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
         </div>
         <div>
-          <div class="header-title">SUPPORTEWP</div>
-          <div class="header-sub">กลุ่มงานพิจารณาอนุญาต 2</div>
+          <h1 class="text-xl font-bold text-white leading-none">SUPPORTEWP</h1>
+          <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-[0.2em] mt-1">Analytics Division 2</p>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <button id="exportExcelBtn" class="export-excel-btn" onclick="exportExcel()" disabled title="ดาวน์โหลดข้อมูลเป็นไฟล์ Excel">
-          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M14.78 3.32a.5.5 0 00-.78-.41L3.11 9.94a.5.5 0 000 .82l10.89 7.03a.5.5 0 00.78-.41V3.32zM17 5h4a1 1 0 011 1v12a1 1 0 01-1 1h-4a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
-          Export Excel
+
+      <div class="flex items-center gap-3">
+        <div id="updateTag" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-gray-400">
+          <span class="indicator-dot dot-online dot-pulse"></span>
+          <span id="lastUpdate">Ready to sync</span>
+        </div>
+        <button id="exportExcelBtn" onclick="exportExcel()" disabled class="px-4 py-2 text-sm font-semibold text-emerald-500 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/5 disabled:opacity-30 transition-all">
+          Export Report
         </button>
-        <button id="fetchBtn" class="fetch-btn" onclick="fetchData()">
-          <svg id="fetchIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-          </svg>
-          ดึงข้อมูล
+        <button id="fetchBtn" onclick="fetchData()" class="btn-primary px-5 py-2 rounded-lg text-sm font-bold text-white flex items-center gap-2">
+          <svg id="fetchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Sync Data
         </button>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <main>
-    <div class="stats-grid">
-      <div class="stat-card stat-card-1 row-in">
-        <div>
-          <div class="stat-label">Case ทั้งหมด</div>
-          <div class="stat-value stat-value-1" id="totalCases">—</div>
+  <main class="max-w-[1600px] mx-auto px-6 py-8">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="glass-card p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-400 font-medium mb-1">Total Case Load</p>
+            <div id="totalCases" class="stat-value text-white num-font">0</div>
+          </div>
+          <div class="p-3 bg-emerald-500/10 rounded-lg text-emerald-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
         </div>
-        <div class="stat-icon stat-icon-1">
-          <svg width="24" height="24" fill="none" stroke="#1abc9c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-      </div>
-      <div class="stat-card stat-card-2 row-in" style="animation-delay:0.1s">
-        <div>
-          <div class="stat-label">จำนวนเจ้าหน้าที่</div>
-          <div class="stat-value stat-value-2" id="totalStaff">—</div>
-        </div>
-        <div class="stat-icon stat-icon-2">
-          <svg width="24" height="24" fill="none" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div class="mt-4 flex items-center text-xs text-emerald-500 font-bold">
+          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"/></svg>
+          Real-time processed
         </div>
       </div>
-      <div class="stat-card stat-card-3 row-in" style="animation-delay:0.2s">
-        <div>
-          <div class="stat-label">เฉลี่ย Case / คน</div>
-          <div class="stat-value stat-value-3" id="avgCases">—</div>
+
+      <div class="glass-card p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-400 font-medium mb-1">Active Staff</p>
+            <div id="totalStaff" class="stat-value text-amber-400 num-font">0</div>
+          </div>
+          <div class="p-3 bg-amber-500/10 rounded-lg text-amber-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
         </div>
-        <div class="stat-icon stat-icon-3">
-          <svg width="24" height="24" fill="none" stroke="#5dade2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+        <div class="mt-4 flex items-center text-xs text-gray-500">On-duty personnel</div>
+      </div>
+
+      <div class="glass-card p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-400 font-medium mb-1">Avg. Distribution</p>
+            <div id="avgCases" class="stat-value text-blue-400 num-font">0</div>
+          </div>
+          <div class="p-3 bg-blue-500/10 rounded-lg text-blue-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+          </div>
         </div>
+        <div class="mt-4 flex items-center text-xs text-gray-500">Case per officer</div>
+      </div>
+
+      <div class="glass-card p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-400 font-medium mb-1">Next Sync In</p>
+            <div id="timerNum" class="stat-value text-white num-font">60</div>
+          </div>
+          <div class="p-3 bg-white/5 rounded-lg text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-xs text-gray-500">Automatic refresh cycle</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
       
-      <div class="panel xl:col-span-1 row-in" style="animation-delay:0.3s">
-        <div class="panel-header">
-          <div class="panel-title">
-            <div class="panel-title-dot" style="background:var(--red-light)"></div>
-            Top 5 เจ้าหน้าที่รับ Case สูงสุด
-          </div>
+      <div class="glass-card xl:col-span-1 p-6">
+        <div class="flex items-center justify-between mb-8">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
+            Performance Top 5
+          </h3>
         </div>
-        <div class="chart-wrap">
-          <div class="chart-inner">
-            <canvas id="topStaffChart"></canvas>
-          </div>
+        <div class="chart-container">
+          <canvas id="topStaffChart"></canvas>
         </div>
       </div>
 
-      <div class="panel xl:col-span-2 row-in" style="animation-delay:0.4s">
-        <div class="panel-header">
-          <div class="panel-title">
-            <div class="panel-title-dot" style="background:#5dade2"></div>
-            รายละเอียดการจ่ายงาน
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <div id="dataStatus" class="status-pill status-wait">
-              <span class="pulse-dot pulse-gray"></span> รอดึงข้อมูล
-            </div>
-            <div class="timer-badge">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#888"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span id="timerNum" class="timer-num">60</span>
-              <span>วิ</span>
-            </div>
+      <div class="glass-card xl:col-span-2 overflow-hidden">
+        <div class="p-6 border-b border-white/5 bg-white/2 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-white">Case Distribution Details</h3>
+          <div class="flex gap-2">
+            <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider">High Load</span>
+            <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-bold uppercase tracking-wider">Optimal</span>
           </div>
         </div>
-        <div style="overflow-x:auto">
-          <table>
+        <div class="overflow-x-auto">
+          <table class="w-full custom-table">
             <thead>
               <tr>
-                <th style="width:60px">#</th>
-                <th>ชื่อเจ้าหน้าที่</th>
-                <th class="center">จำนวน Case</th>
-                <th class="center">สัดส่วน</th>
-                <th>สถานะ</th>
+                <th class="w-20">Rank</th>
+                <th>Staff Name</th>
+                <th class="text-center">Cases</th>
+                <th class="w-48">Efficiency Index</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody id="dataTable">
               <tr>
-                <td colspan="5">
-                  <div class="empty-state">
-                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <p>กดปุ่ม "ดึงข้อมูล" เพื่อโหลดข้อมูลล่าสุด</p>
+                <td colspan="5" class="py-24 text-center">
+                  <div class="flex flex-col items-center gap-3 opacity-30">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <p class="text-sm font-medium">No data synced. Click "Sync Data" to begin.</p>
                   </div>
                 </td>
               </tr>
@@ -346,9 +240,17 @@
           </table>
         </div>
       </div>
+
     </div>
 
-    <footer>© 2024 กลุ่มงานพิจารณาอนุญาต 2 · ระบบแสดงข้อมูลการจ่ายงาน</footer>
+    <footer class="mt-12 py-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-gray-500 text-xs">
+      <p>© 2026 SUPPORTEWP System · Employment Division 2</p>
+      <div class="flex items-center gap-6 mt-4 md:mt-0">
+        <a href="#" class="hover:text-emerald-500 transition-colors">Data Privacy</a>
+        <a href="#" class="hover:text-emerald-500 transition-colors">System Status</a>
+        <a href="#" class="hover:text-emerald-500 transition-colors">v2.5.0-Enterprise</a>
+      </div>
+    </footer>
   </main>
 
   <script>
@@ -362,44 +264,26 @@
 
     window.addEventListener('load', () => { fetchDataAuto(); });
 
-    function formatDateTimeThai() {
-      const now = new Date();
-      const year = now.getFullYear() + 543;
-      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      return `${now.getDate()} ${months[now.getMonth()]} ${year} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    }
-
-    function startCountdown() {
-      timeRemaining = 60;
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(() => {
-        timeRemaining--;
-        const timerEl = document.getElementById('timerNum');
-        if (timerEl) {
-          timerEl.textContent = timeRemaining;
-          timerEl.className = 'timer-num' + (timeRemaining <= 10 ? ' timer-urgent' : '');
-        }
-        if (timeRemaining <= 0) { clearInterval(countdownInterval); fetchDataAuto(); }
-      }, 1000);
-    }
-
-    // ✅ Modern Connected Loading Overlay
+    // ✅ Professional Loader
     function showLoading() {
-      const overlay = document.createElement('div');
-      overlay.id = 'loadingOverlay';
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;transition:opacity 0.3s;';
-      overlay.innerHTML = `
-        <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:48px 60px;text-align:center;box-shadow:0 20px 80px rgba(0,0,0,0.8);max-width:320px">
-          <div class="spin" style="width:48px;height:48px;border:3px solid rgba(46,204,113,0.1);border-top-color:#2ecc71;border-radius:50%;margin:0 auto 24px"></div>
-          <div style="font-family:'Chakra Petch',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:6px;color:white">正在拉取ข้อมูล</div>
-          <div style="color:#888;font-size:0.85rem">กำลังเชื่อมต่อ Google Sheets...</div>
+      const modal = document.createElement('div');
+      modal.id = 'proLoader';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(5,7,10,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:all 0.4s ease;';
+      modal.innerHTML = `
+        <div class="flex flex-col items-center gap-5">
+          <div class="loader-ring"></div>
+          <div class="flex flex-col items-center">
+            <span class="text-emerald-500 font-bold tracking-widest text-[10px] uppercase">Syncing Database</span>
+            <span class="text-white/50 text-xs mt-1">Fetching records from secure server...</span>
+          </div>
         </div>`;
-      document.body.appendChild(overlay);
-      requestAnimationFrame(() => overlay.style.opacity = '1');
+      document.body.appendChild(modal);
+      setTimeout(() => modal.style.opacity = '1', 10);
     }
+
     function hideLoading() {
-      const overlay = document.getElementById('loadingOverlay');
-      if(overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 300); }
+      const modal = document.getElementById('proLoader');
+      if(modal) { modal.style.opacity = '0'; setTimeout(() => modal.remove(), 400); }
     }
 
     async function fetchData() {
@@ -411,10 +295,10 @@
       try {
         await doFetch();
         hideLoading();
-        Swal.fire({ icon: 'success', title: 'อัปเดตแล้ว!', text:`พบเจ้าหน้าที่ ${staffData.length} ท่าน`, confirmButtonColor: '#27ae60', background: '#1a1a1a', color: '#fff', timer: 2000, timerProgressBar: true });
+        Swal.fire({ icon: 'success', title: 'Data Synchronized', text:`Successfully processed ${staffData.length} active records.`, background: '#111827', color: '#fff', confirmButtonColor: '#10b981', timer: 2000 });
       } catch (e) {
         hideLoading();
-        Swal.fire({ icon: 'error', title: 'ดึงข้อมูลล้มเหลว', text: 'ตรวจสอบการเชื่อมต่อหรือการตั้งค่า Public ของ Sheet', confirmButtonColor: '#27ae60', background: '#1a1a1a', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Sync Failed', text: 'Cloud connection timeout. Please check your network.', background: '#111827', color: '#fff', confirmButtonColor: '#10b981' });
       } finally {
         btn.disabled = false; icon.classList.remove('spin');
         startCountdown();
@@ -422,11 +306,7 @@
     }
 
     async function fetchDataAuto() {
-      try { await doFetch(); startCountdown(); } catch(e) { 
-        document.getElementById('dataStatus').className = 'status-pill status-error';
-        document.getElementById('dataStatus').innerHTML = `<span class="pulse-dot pulse-red"></span> ผิดพลาด`;
-        startCountdown(); 
-      }
+      try { await doFetch(); startCountdown(); } catch(e) { startCountdown(); }
     }
 
     async function doFetch() {
@@ -454,115 +334,136 @@
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count);
 
-      updateDashboard();
+      updateStats();
       updateChart(staffData.slice(0, 5));
       updateTable();
     }
 
-    function updateDashboard() {
+    function updateStats() {
       const total = staffData.reduce((s, d) => s + d.count, 0);
-      animateNumber('totalCases', total);
-      animateNumber('totalStaff', staffData.length);
-      document.getElementById('avgCases').textContent = staffData.length ? (total/staffData.length).toFixed(1) : 0;
+      animateValue('totalCases', total);
+      animateValue('totalStaff', staffData.length);
+      document.getElementById('avgCases').textContent = staffData.length ? (total/staffData.length).toFixed(1) : '0.0';
       document.getElementById('exportExcelBtn').disabled = staffData.length === 0;
 
-      const dt = formatDateTimeThai();
-      const statusEl = document.getElementById('dataStatus');
-      statusEl.className = 'status-pill status-live';
-      statusEl.innerHTML = `<span class="pulse-dot pulse-green"></span> ล่าสุด ${dt}`;
+      const now = new Date();
+      document.getElementById('lastUpdate').textContent = `Synced at ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+      document.getElementById('updateTag').classList.remove('hidden');
     }
 
-    function animateNumber(id, target) {
-      const el = document.getElementById(id);
-      let start = 0; const duration = 1200; const startTime = performance.now();
-      function step(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        el.textContent = Math.floor(easeOutQuart * target).toLocaleString();
-        if (progress < 1) requestAnimationFrame(step);
+    function animateValue(id, target) {
+      const obj = document.getElementById(id);
+      let start = 0;
+      const duration = 1500;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        obj.textContent = Math.floor(ease * target).toLocaleString();
+        if (progress < 1) requestAnimationFrame(update);
       }
-      requestAnimationFrame(step);
+      requestAnimationFrame(update);
     }
 
-    // ✅ Staggered Rows Table Animation
+    function startCountdown() {
+      timeRemaining = 60;
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        timeRemaining--;
+        document.getElementById('timerNum').textContent = timeRemaining;
+        if (timeRemaining <= 0) { clearInterval(countdownInterval); fetchDataAuto(); }
+      }, 1000);
+    }
+
     function updateTable() {
       const tbody = document.getElementById('dataTable');
       const total = staffData.reduce((s, d) => s + d.count, 0);
-      
+      const avg = total / staffData.length;
+
       tbody.innerHTML = staffData.map((s, i) => {
         const pct = ((s.count / total) * 100).toFixed(1);
-        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
-        const avg = total / staffData.length;
-        const chipStatus = s.count > avg * 1.2 ? 'chip-high' : s.count < avg * 0.8 ? 'chip-low' : 'chip-ok';
-        const chipText = s.count > avg * 1.2 ? 'งานแน่น' : s.count < avg * 0.8 ? 'งานน้อย' : 'ปกติ';
-
+        const isTop = i < 3;
+        const statusColor = s.count > avg * 1.2 ? 'text-emerald-400 bg-emerald-400/10' : 'text-blue-400 bg-blue-400/10';
+        
         return `
-          <tr class="row-in" style="animation-delay: ${0.3 + (i * 0.04)}s">
-            <td><div class="rank-badge ${rankClass}">${i + 1}</div></td>
+          <tr class="hover:bg-white/[0.02] transition-colors duration-200">
+            <td class="num-font text-gray-500 font-bold">${(i + 1).toString().padStart(2, '0')}</td>
             <td class="font-medium text-white">${s.name}</td>
-            <td class="center"><span class="case-pill">${s.count}</span></td>
+            <td class="text-center font-bold num-font text-emerald-400">${s.count}</td>
             <td>
-              <div class="progress-wrap">
-                <div class="progress-track"><div class="progress-fill" style="width: ${pct}%"></div></div>
-                <span class="progress-pct">${pct}%</span>
+              <div class="flex items-center gap-3">
+                <div class="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full" style="width: ${pct}%"></div>
+                </div>
+                <span class="text-[10px] text-gray-400 num-font w-8">${pct}%</span>
               </div>
             </td>
-            <td><span class="chip ${chipStatus}"><span class="w-1.5 h-1.5 rounded-full" style="background:currentColor"></span>${chipText}</span></td>
+            <td>
+              <span class="px-2 py-1 rounded-md text-[10px] font-bold ${statusColor}">
+                ${s.count > avg * 1.2 ? 'Peak Performance' : 'Active'}
+              </span>
+            </td>
           </tr>
         `;
       }).join('');
     }
 
-    // ✅ Glowing Neon Chart
     function updateChart(data) {
       const ctx = document.getElementById('topStaffChart').getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 400, 0);
-      gradient.addColorStop(0, 'rgba(46, 204, 113, 1)');  
-      gradient.addColorStop(1, 'rgba(26, 188, 156, 0.4)');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: data.map(d => d.name),
-          datasets: [{ data: data.map(d => d.count), backgroundColor: gradient, borderRadius: 20, barThickness: 16 }]
+          datasets: [{
+            data: data.map(d => d.count),
+            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            hoverBackgroundColor: '#10b981',
+            borderRadius: 6,
+            barThickness: 24,
+          }]
         },
         options: {
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 1500, easing: 'easeOutQuart' },
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: '#1a1a1a', cornerRadius: 10, padding: 12, displayColors: false,
-              titleFont: { family:'Sarabun', size: 14 }, bodyFont: { family:'Sarabun' },
-              callbacks: { label: c => ` รับงาน: ${c.raw} Case` }
+              backgroundColor: '#1f2937',
+              padding: 12,
+              titleFont: { size: 12, weight: 'bold' },
+              bodyFont: { size: 11 },
+              cornerRadius: 8,
+              borderColor: 'rgba(255,255,255,0.1)',
+              borderWidth: 1
             }
           },
           scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { family: 'Chakra Petch', size:10 } } },
-            y: { grid: { display: false }, ticks: { color: '#ccc', font: { family: 'Sarabun', size: 13 } } }
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280', font: { size: 10 } } },
+            y: { grid: { display: false }, ticks: { color: '#f3f4f6', font: { size: 11 } } }
           }
         }
       });
     }
 
     function exportExcel() {
-      const total = staffData.reduce((s, d) => s + d.count, 0);
-      const avg = total / staffData.length;
-      const dataForExcel = staffData.map((s, i) => ({
-        "อันดับ": i + 1,
-        "ชื่อเจ้าหน้าที่": s.name,
-        "จำนวน Case": s.count,
-        "สัดส่วน (%)": ((s.count / total) * 100).toFixed(1),
-        "สถานะ": s.count > avg * 1.2 ? 'งานแน่น' : s.count < avg * 0.8 ? 'งานน้อย' : 'ปกติ'
+      const data = staffData.map((s, i) => ({
+        "Rank": i + 1,
+        "Officer Name": s.name,
+        "Total Cases": s.count,
+        "Workload (%)": ((s.count / staffData.reduce((a,b)=>a+b.count,0)) * 100).toFixed(1)
       }));
-      const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "รายงานการจ่ายงาน");
-      worksheet['!cols'] = [{ wch: 8 }, { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
-      XLSX.writeFile(workbook, `SupportEWP_Report_${new Date().getTime()}.xlsx`);
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Workload Report");
+      XLSX.writeFile(wb, `EWP_Report_${new Date().getTime()}.xlsx`);
     }
   </script>
 </body>
