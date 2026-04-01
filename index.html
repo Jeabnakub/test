@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแสดงข้อมูลการจ่ายงาน SUPPORTEWP</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red-deep: #27ae60;
+      --red-mid: #2ecc71;
+      --red-light: #1abc9c;
+      --red-glow: rgba(46, 204, 113, 0.25);
+      --gold: #f39c12;
+      --gold-light: #f1c40f;
+      --bg-dark: #0f0f0f;
+      --bg-card: #1a1a1a;
+      --bg-card2: #222222;
+      --border: rgba(255,255,255,0.07);
+      --text-bright: #ffffff;
+      --text-mid: #cccccc;
+      --text-dim: #888888;
+    }
+    * { font-family: 'Sarabun', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg-dark); color: var(--text-bright); min-height: 100vh; overflow-x: hidden; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    .ambient-blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .blob-1 { width: 600px; height: 600px; background: rgba(46,204,113,0.12); top: -200px; right: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: rgba(243,156,18,0.06); bottom: 100px; left: -100px; }
+
+    header {
+      position: relative; z-index: 10;
+      background: linear-gradient(180deg, rgba(15,70,35,0.98) 0%, rgba(10,50,25,0.95) 100%);
+      border-bottom: 1px solid rgba(46,204,113,0.3);
+      box-shadow: 0 1px 0 rgba(46,204,113,0.2), 0 20px 60px rgba(0,0,0,0.5);
+      backdrop-filter: blur(20px);
+    }
+    .header-inner { max-width: 1400px; margin: 0 auto; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+    .logo-box {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-light) 100%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(46,204,113,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .header-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 1.25rem; font-weight: 700; letter-spacing: 0.03em;
+      background: linear-gradient(90deg, #fff 0%, #b0ffb0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .btn-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .fetch-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 10px; border: none; cursor: pointer;
+      font-family: 'Sarabun', sans-serif; font-size: 0.95rem; font-weight: 600;
+      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-mid) 100%);
+      color: white; transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(46,204,113,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+      position: relative; overflow: hidden;
+    }
+    .fetch-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .fetch-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(46,204,113,0.5); }
+    .fetch-btn:hover::after { opacity: 1; }
+    .fetch-btn:active { transform: translateY(0); }
+    .fetch-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Export button */
+    .export-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 10px; cursor: pointer;
+      font-family: 'Sarabun', sans-serif; font-size: 0.9rem; font-weight: 600;
+      background: transparent;
+      color: #f1c40f;
+      border: 1px solid rgba(241,196,15,0.35);
+      transition: all 0.25s ease;
+    }
+    .export-btn:hover { background: rgba(241,196,15,0.1); border-color: rgba(241,196,15,0.6); transform: translateY(-2px); }
+    .export-btn:active { transform: translateY(0); }
+    .export-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    main { max-width: 1400px; margin: 0 auto; padding: 32px; position: relative; z-index: 1; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; inset: 0; border-radius: 18px; opacity: 0; transition: opacity 0.3s; }
+    .stat-card:hover { transform: translateY(-3px); border-color: rgba(46,204,113,0.3); }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-card-1::before { background: linear-gradient(135deg, rgba(46,204,113,0.08) 0%, transparent 60%); }
+    .stat-card-2::before { background: linear-gradient(135deg, rgba(243,156,18,0.08) 0%, transparent 60%); }
+    .stat-card-3::before { background: linear-gradient(135deg, rgba(52,152,219,0.08) 0%, transparent 60%); }
+
+    .stat-label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .stat-value { font-family: 'Chakra Petch', sans-serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
+    .stat-value-1 { color: var(--red-light); }
+    .stat-value-2 { color: var(--gold-light); }
+    .stat-value-3 { color: #5dade2; }
+
+    .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-icon-1 { background: rgba(46,204,113,0.15); }
+    .stat-icon-2 { background: rgba(243,156,18,0.15); }
+    .stat-icon-3 { background: rgba(52,152,219,0.15); }
+
+    .stat-card::after { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; border-radius: 0 0 4px 4px; }
+    .stat-card-1::after { background: linear-gradient(90deg, transparent, var(--red-mid), transparent); }
+    .stat-card-2::after { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+    .stat-card-3::after { background: linear-gradient(90deg, transparent, #5dade2, transparent); }
+
+    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
+    .panel-header {
+      padding: 20px 28px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+    }
+    .panel-title {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 1rem; font-weight: 600; color: var(--text-bright);
+      font-family: 'Chakra Petch', sans-serif; letter-spacing: 0.03em;
+    }
+    .panel-title-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; }
+    .status-live { background: rgba(46,204,113,0.12); color: #2ecc71; border: 1px solid rgba(46,204,113,0.2); }
+    .status-wait { background: rgba(136,136,136,0.1); color: var(--text-dim); border: 1px solid rgba(136,136,136,0.15); }
+    .status-error { background: rgba(231,76,60,0.12); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
+
+    .pulse-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+    .pulse-green { background: #2ecc71; animation: pulse-glow-green 2s infinite; }
+    .pulse-gray { background: #888; }
+    .pulse-red { background: #e74c3c; animation: pulse-glow-red 2s infinite; }
+    @keyframes pulse-glow-green { 0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,0.5)} 50%{box-shadow:0 0 0 5px rgba(46,204,113,0)} }
+    @keyframes pulse-glow-red { 0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.5)} 50%{box-shadow:0 0 0 5px rgba(231,76,60,0)} }
+
+    .timer-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-dim); }
+    .timer-num {
+      font-family: 'Chakra Petch', sans-serif; font-size: 0.9rem; font-weight: 700;
+      min-width: 28px; text-align: center;
+      background: rgba(255,255,255,0.06); border-radius: 6px; padding: 2px 6px;
+      color: var(--text-mid); transition: color 0.3s, background 0.3s;
+    }
+    .timer-urgent { color: #2ecc71 !important; background: rgba(46,204,113,0.15) !important; }
+
+    .chart-wrap { padding: 24px 28px; }
+    .chart-inner { position: relative; height: 260px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: rgba(255,255,255,0.03); }
+    th { padding: 13px 20px; text-align: left; font-size: 0.72rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; border-bottom: 1px solid var(--border); }
+    th.center { text-align: center; }
+    td { padding: 14px 20px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    tbody tr { transition: background 0.2s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .rank-badge { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-family: 'Chakra Petch', sans-serif; font-size: 0.85rem; font-weight: 700; }
+    .rank-1 { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #000; box-shadow: 0 4px 12px rgba(46,204,113,0.4); }
+    .rank-2 { background: linear-gradient(135deg, #bdc3c7, #ecf0f1); color: #000; box-shadow: 0 4px 12px rgba(189,195,199,0.3); }
+    .rank-3 { background: linear-gradient(135deg, #1abc9c, #16a085); color: #fff; box-shadow: 0 4px 12px rgba(26,188,156,0.3); }
+    .rank-n { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+
+    .case-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 4px 12px; border-radius: 8px; font-family: 'Chakra Petch', sans-serif; font-size: 1rem; font-weight: 700; background: rgba(46,204,113,0.15); color: var(--red-light); border: 1px solid rgba(46,204,113,0.2); }
+
+    .progress-wrap { display: flex; align-items: center; gap: 10px; }
+    .progress-track { flex: 1; max-width: 100px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); }
+    .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--red-deep), var(--red-light)); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .progress-pct { font-size: 0.8rem; color: var(--text-dim); font-family: 'Chakra Petch', sans-serif; min-width: 42px; }
+
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+    .chip-high { background: rgba(46,204,113,0.12); color: #55efc4; border: 1px solid rgba(46,204,113,0.2); }
+    .chip-low  { background: rgba(243,156,18,0.12); color: #ffd54f; border: 1px solid rgba(243,156,18,0.2); }
+    .chip-ok   { background: rgba(52,152,219,0.12); color: #82c4f8; border: 1px solid rgba(52,152,219,0.2); }
+
+    .empty-state { padding: 64px 20px; text-align: center; color: var(--text-dim); }
+    .empty-state svg { margin: 0 auto 16px; opacity: 0.25; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* Error banner */
+    .error-banner {
+      display: none; margin: 0 28px 0; padding: 12px 16px; border-radius: 10px;
+      background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.25);
+      color: #e74c3c; font-size: 0.82rem; gap: 8px; align-items: flex-start;
+    }
+    .error-banner.show { display: flex; }
+
+    footer { text-align: center; padding: 28px 0; color: var(--text-dim); font-size: 0.78rem; letter-spacing: 0.05em; }
+
+    @keyframes flash-green { 0%{background:rgba(46,204,113,0.08)} 100%{background:transparent} }
+    .flash { animation: flash-green 0.7s ease-out; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 0.8s linear infinite; }
+    @keyframes rowIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .row-in { animation: rowIn 0.35s ease-out both; }
+  </style>
+</head>
+<body>
+  <div class="ambient-blob blob-1"></div>
+  <div class="ambient-blob blob-2"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="logo-box">
+          <svg width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <div class="header-title">SUPPORTEWP</div>
+          <div class="header-sub">ระบบแสดงข้อมูลการจ่ายงาน · กลุ่มงานพิจารณาอนุญาต 2</div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <!-- ✅ Export CSV button -->
+        <button id="exportBtn" class="export-btn" onclick="exportCSV()" disabled title="ดาวน์โหลดข้อมูลเป็น CSV">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+        <button id="fetchBtn" class="fetch-btn" onclick="fetchData()">
+          <svg id="fetchIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          ดึงข้อมูล
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card-1">
+        <div>
+          <div class="stat-label">Case ทั้งหมด</div>
+          <div class="stat-value stat-value-1" id="totalCases">—</div>
+        </div>
+        <div class="stat-icon stat-icon-1">
+          <svg width="24" height="24" fill="none" stroke="#1abc9c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card stat-card-2">
+        <div>
+          <div class="stat-label">จำนวนเจ้าหน้าที่</div>
+          <div class="stat-value stat-value-2" id="totalStaff">—</div>
+        </div>
+        <div class="stat-icon stat-icon-2">
+          <svg width="24" height="24" fill="none" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card stat-card-3">
+        <div>
+          <div class="stat-label">เฉลี่ย Case / คน</div>
+          <div class="stat-value stat-value-3" id="avgCases">—</div>
+        </div>
+        <div class="stat-icon stat-icon-3">
+          <svg width="24" height="24" fill="none" stroke="#5dade2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+            <line x1="2" y1="20" x2="22" y2="20"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart panel -->
+    <div class="panel" id="chartPanel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="panel-title-dot" style="background:var(--red-light)"></div>
+          Top 5 เจ้าหน้าที่รับ Case สูงสุด
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-inner">
+          <canvas id="topStaffChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table panel -->
+    <div class="panel" id="tablePanel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="panel-title-dot" style="background:#5dade2"></div>
+          รายละเอียดการจ่ายงาน
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div id="dataStatus" class="status-pill status-wait">
+            <span class="pulse-dot pulse-gray"></span> รอดึงข้อมูล
+          </div>
+          <div class="timer-badge">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#888">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span id="timerNum" class="timer-num">60</span>
+            <span>วิ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Error banner -->
+      <div id="errorBanner" class="error-banner">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div id="errorText"></div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:60px">#</th>
+              <th>ชื่อเจ้าหน้าที่</th>
+              <th class="center">จำนวน Case</th>
+              <th class="center">สัดส่วน</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable">
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p>กดปุ่ม "ดึงข้อมูล" เพื่อโหลดข้อมูลจาก Google Sheet</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>© 2024 ระบบแสดงข้อมูลการจ่ายงาน SUPPORTEWP · กลุ่มงานพิจารณาอนุญาต 2</footer>
+  </main>
+
+  <script>
+    let chart = null;
+    let staffData = [];
+    let countdownInterval = null;
+    let timeRemaining = 60;
+
+    const SHEET_ID = '1ZCgi_egwYyQMnd33WjhW2g_KsFXzbkBajgj96Hn1U_g';
+    const GID = '404719184';
+
+    // ─── CORS-safe URLs (try 2 endpoints) ───────────────────────────
+    function getSheetUrls() {
+      return [
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`,
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`
+      ];
+    }
+
+    window.addEventListener('load', () => { fetchDataAuto(); });
+
+    function formatDateTimeThai() {
+      const now = new Date();
+      const year = now.getFullYear() + 543;
+      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const d = String(now.getDate()).padStart(2,'0');
+      const m = months[now.getMonth()];
+      const h = String(now.getHours()).padStart(2,'0');
+      const min = String(now.getMinutes()).padStart(2,'0');
+      return `${d} ${m} ${year}  ${h}:${min}`;
+    }
+
+    // ✅ Fixed: startCountdown resets the timer properly
+    function startCountdown() {
+      timeRemaining = 60;
+      if (countdownInterval) clearInterval(countdownInterval);
+      const el = document.getElementById('timerNum');
+      if (el) { el.textContent = 60; el.className = 'timer-num'; }
+
+      countdownInterval = setInterval(() => {
+        timeRemaining--;
+        const el = document.getElementById('timerNum');
+        if (el) {
+          el.textContent = timeRemaining;
+          el.className = 'timer-num' + (timeRemaining <= 10 ? ' timer-urgent' : '');
+        }
+        if (timeRemaining <= 0) { clearInterval(countdownInterval); fetchDataAuto(); }
+      }, 1000);
+    }
+
+    function hideError() {
+      const b = document.getElementById('errorBanner');
+      b.classList.remove('show');
+    }
+    function showError(msg) {
+      const b = document.getElementById('errorBanner');
+      document.getElementById('errorText').textContent = msg;
+      b.classList.add('show');
+    }
+
+    // ✅ Fixed: manual fetch resets countdown
+    async function fetchData() {
+      const btn = document.getElementById('fetchBtn');
+      const icon = document.getElementById('fetchIcon');
+      btn.disabled = true;
+      icon.classList.add('spin');
+
+      // Reset countdown immediately on manual press
+      if (countdownInterval) clearInterval(countdownInterval);
+      const timerEl = document.getElementById('timerNum');
+      if (timerEl) { timerEl.textContent = '…'; timerEl.className = 'timer-num'; }
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:100';
+      overlay.innerHTML = `
+        <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:40px 48px;text-align:center;max-width:320px;width:90%">
+          <div style="width:52px;height:52px;border-radius:50%;border:3px solid rgba(46,204,113,0.2);border-top-color:#2ecc71;animation:spin 0.8s linear infinite;margin:0 auto 20px"></div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:8px">กำลังดึงข้อมูล</div>
+          <div id="loadMsg" style="color:#888;font-size:0.85rem;margin-bottom:20px">กำลังเชื่อมต่อ Google Sheet...</div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:3px;overflow:hidden">
+            <div id="loadBar" style="height:100%;width:20%;background:linear-gradient(90deg,#27ae60,#2ecc71);border-radius:4px;transition:width 0.4s ease"></div>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      setTimeout(() => { const b=document.getElementById('loadBar'); const m=document.getElementById('loadMsg'); if(b) b.style.width='55%'; if(m) m.textContent='ดึงข้อมูล...'; }, 400);
+      setTimeout(() => { const b=document.getElementById('loadBar'); const m=document.getElementById('loadMsg'); if(b) b.style.width='80%'; if(m) m.textContent='ประมวลผลข้อมูล...'; }, 900);
+
+      try {
+        await doFetch();
+        document.getElementById('loadBar').style.width = '100%';
+        hideError();
+        setTimeout(() => {
+          overlay.remove();
+          Swal.fire({ icon:'success', title:'สำเร็จ! ✨', text:`พบข้อมูล ${staffData.length} รายการ`, confirmButtonColor:'#27ae60', timer:2000, timerProgressBar:true, background:'#1a1a1a', color:'#fff' });
+        }, 300);
+      } catch(e) {
+        overlay.remove();
+        const errMsg = e.message || 'ไม่สามารถดึงข้อมูลได้';
+        Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: errMsg, confirmButtonColor:'#27ae60', background:'#1a1a1a', color:'#fff' });
+        setStatusError();
+        showError(`ดึงข้อมูลไม่สำเร็จ: ${errMsg} — ตรวจสอบว่า Google Sheet เปิดเป็น Public`);
+      }
+
+      btn.disabled = false;
+      icon.classList.remove('spin');
+      startCountdown(); // ✅ always restart countdown after manual fetch
+    }
+
+    async function fetchDataAuto() {
+      try { await doFetch(); hideError(); startCountdown(); }
+      catch(e) {
+        setStatusError();
+        showError(`ดึงข้อมูลไม่สำเร็จ: ${e.message || 'ไม่ทราบสาเหตุ'} — ตรวจสอบว่า Google Sheet เปิดเป็น Public`);
+        startCountdown();
+      }
+    }
+
+    // ✅ Fixed: better CORS handling with timeout + clear error messages
+    async function doFetch() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      let res;
+      try {
+        res = await fetch(url, { signal: controller.signal });
+      } catch(e) {
+        clearTimeout(timeout);
+        if (e.name === 'AbortError') throw new Error('หมดเวลาการเชื่อมต่อ (timeout 10s)');
+        throw new Error('ไม่สามารถเชื่อมต่อได้ — ตรวจสอบอินเทอร์เน็ต');
+      }
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error(`Server ตอบกลับ HTTP ${res.status}`);
+
+      const text = await res.text();
+
+      // gviz response starts with )]}' or google.visualization.Query.setResponse(
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      if (jsonStart === -1 || jsonEnd === -1) throw new Error('รูปแบบข้อมูลไม่ถูกต้อง — Sheet อาจไม่ได้ตั้งค่าเป็น Public');
+
+      let data;
+      try {
+        data = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
+      } catch(e) {
+        throw new Error('แปลงข้อมูล JSON ไม่สำเร็จ');
+      }
+
+      if (!data.table) throw new Error('ไม่พบตารางข้อมูลใน Sheet — ตรวจสอบ GID');
+
+      processData(data);
+      setStatusLive();
+    }
+
+    function setStatusLive() {
+      const dt = formatDateTimeThai();
+      document.getElementById('dataStatus').className = 'status-pill status-live';
+      document.getElementById('dataStatus').innerHTML = `<span class="pulse-dot pulse-green"></span> ${dt}`;
+    }
+    function setStatusError() {
+      document.getElementById('dataStatus').className = 'status-pill status-error';
+      document.getElementById('dataStatus').innerHTML = `<span class="pulse-dot pulse-red"></span> เชื่อมต่อไม่ได้`;
+    }
+
+    // ✅ Fixed: column detection with fallback warning
+    function processData(data) {
+      const rows = data.table.rows;
+      const cols = data.table.cols;
+
+      // Find staff column
+      const nameKeywords = ['ชื่อเจ้าหน้าที่','เจ้าหน้าที่','ผู้รับผิดชอบ','staff','name','ชื่อ'];
+      let staffCol = -1;
+      cols.forEach((c, i) => {
+        if (nameKeywords.some(n => (c.label||'').toLowerCase().includes(n.toLowerCase()))) {
+          staffCol = i;
+        }
+      });
+
+      if (staffCol === -1) {
+        // Fallback: use first non-empty column but warn
+        staffCol = 0;
+        console.warn('[SUPPORTEWP] ไม่พบคอลัมน์ชื่อเจ้าหน้าที่ — ใช้คอลัมน์แรกแทน. คอลัมน์ที่พบ:', cols.map(c=>c.label));
+      }
+
+      const counts = {};
+      rows.forEach(r => {
+        if (r.c && r.c[staffCol]) {
+          const name = (r.c[staffCol].v || r.c[staffCol].f || '').toString().trim();
+          if (name) counts[name] = (counts[name]||0) + 1;
+        }
+      });
+
+      staffData = Object.entries(counts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
+
+      // Enable export once data loaded
+      document.getElementById('exportBtn').disabled = staffData.length === 0;
+
+      updateDashboard();
+      updateChart();
+      updateTable();
+      document.getElementById('tablePanel').classList.add('flash');
+      setTimeout(() => document.getElementById('tablePanel').classList.remove('flash'), 700);
+    }
+
+    function updateDashboard() {
+      const total = staffData.reduce((s,d)=>s+d.count,0);
+      const n = staffData.length;
+      animNum('totalCases', total);
+      animNum('totalStaff', n);
+      document.getElementById('avgCases').textContent = n ? (total/n).toFixed(1) : '—';
+    }
+
+    function animNum(id, target) {
+      const el = document.getElementById(id);
+      const t0 = performance.now();
+      function frame(now) {
+        const p = Math.min((now-t0)/900, 1);
+        const ease = 1-Math.pow(1-p,3);
+        el.textContent = Math.round(ease*target).toLocaleString();
+        if (p<1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function updateChart() {
+      const ctx = document.getElementById('topStaffChart').getContext('2d');
+      const top5 = staffData.slice(0,5);
+
+      const barColors = ['#2ecc71','#27ae60','#1abc9c','#16a085','#138d75'];
+
+      // ✅ Update data instead of destroy+recreate to avoid flicker
+      if (chart) {
+        chart.data.labels = top5.map(s => s.name.length > 14 ? s.name.substring(0,14)+'…' : s.name);
+        chart.data.datasets[0].data = top5.map(s => s.count);
+        chart.update('active');
+        return;
+      }
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: top5.map(s => s.name.length > 14 ? s.name.substring(0,14)+'…' : s.name),
+          datasets: [{
+            label: 'จำนวน Case',
+            data: top5.map(s => s.count),
+            backgroundColor: barColors.map((c,i) => {
+              const g = ctx.createLinearGradient(0, 0, 0, 260);
+              g.addColorStop(0, barColors[i]);
+              g.addColorStop(1, barColors[i]+'55');
+              return g;
+            }),
+            borderColor: barColors,
+            borderWidth: 0,
+            borderRadius: 10,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+              titleFont: { size: 13, family: 'Sarabun', weight: '600' },
+              bodyFont: { size: 13, family: 'Sarabun' },
+              padding: 12, cornerRadius: 10,
+              callbacks: { label: ctx => ` ${ctx.parsed.y} Case` }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+              ticks: { font: { family:'Sarabun', size:12 }, color:'#666', padding:8 },
+              border: { display: false }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family:'Sarabun', size:12 }, color:'#aaa', padding:8 },
+              border: { display: false }
+            }
+          },
+          animation: { duration: 900, easing: 'easeOutQuart' }
+        }
+      });
+    }
+
+    function updateTable() {
+      const tbody = document.getElementById('dataTable');
+      const total = staffData.reduce((s,d)=>s+d.count,0);
+      const avg = total / staffData.length;
+      tbody.innerHTML = staffData.map((s, i) => {
+        const pct = ((s.count/total)*100).toFixed(1);
+        let chip = '';
+        if (s.count > avg*1.5)      chip = `<span class="chip chip-high">↑ สูงกว่าเฉลี่ย</span>`;
+        else if (s.count < avg*0.5) chip = `<span class="chip chip-low">↓ ต่ำกว่าเฉลี่ย</span>`;
+        else                        chip = `<span class="chip chip-ok">● ปกติ</span>`;
+        const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+        return `<tr class="row-in" style="animation-delay:${i*40}ms">
+          <td><span class="rank-badge ${rankClass}">${i+1}</span></td>
+          <td style="font-weight:500;color:#eee">${s.name}</td>
+          <td style="text-align:center"><span class="case-pill">${s.count}</span></td>
+          <td style="text-align:center">
+            <div class="progress-wrap" style="justify-content:center">
+              <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+              <span class="progress-pct">${pct}%</span>
+            </div>
+          </td>
+          <td>${chip}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ✅ Export CSV
+    function exportCSV() {
+      if (!staffData.length) return;
+      const total = staffData.reduce((s,d)=>s+d.count,0);
+      const avg = (total / staffData.length).toFixed(2);
+
+      const rows = [
+        ['\uFEFF#','ชื่อเจ้าหน้าที่','จำนวน Case','สัดส่วน (%)','สถานะ'], // BOM for Thai Excel
+        ...staffData.map((s, i) => {
+          const pct = ((s.count/total)*100).toFixed(1);
+          let status = 'ปกติ';
+          if (s.count > avg*1.5)      status = 'สูงกว่าเฉลี่ย';
+          else if (s.count < avg*0.5) status = 'ต่ำกว่าเฉลี่ย';
+          return [i+1, s.name, s.count, pct, status];
+        }),
+        [],
+        ['','รวมทั้งหมด', total, '100.0', ''],
+        ['','ค่าเฉลี่ย', avg, '', ''],
+      ];
+
+      const csvContent = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const now = new Date();
+      const fname = `supportewp_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.csv`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  </script>
+</body>
+</html>
