@@ -1,328 +1,582 @@
 <!doctype html>
 <html lang="th" class="h-full">
-<head>
+ <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>e-Workpermit | Executive Analytics</title>
+  <title>ระบบทะเบียนคุมการบันทึกข้อมูลสารสนเทศแรงงานต่างด้าว</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-main: #F1F5F9;
-      --card-bg: #FFFFFF;
-      --primary: #1E293B; /* Slate 800 */
-      --accent: #2563EB;  /* Blue 600 */
-      --text-dark: #0F172A;
-      --text-muted: #64748B;
-      --border-color: #E2E8F0;
-    }
-    
-    * { font-family: 'Sarabun', 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-    .num-font { font-family: 'Inter', sans-serif; }
-
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-dark);
-    }
-
-    /* Professional Card Style */
-    .pro-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      transition: box-shadow 0.2s ease;
-    }
-    .pro-card:hover {
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
-    }
-
-    /* KPI styling */
-    .kpi-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .kpi-value { font-size: 2.5rem; font-weight: 700; color: var(--text-dark); letter-spacing: -0.02em; }
-
-    /* Button Style */
-    .btn-primary {
-      background: var(--accent); color: white;
-      font-weight: 600; border-radius: 8px;
-      transition: all 0.2s;
-    }
-    .btn-primary:hover { background: #1D4ED8; transform: translateY(-1px); }
-    .btn-secondary {
-      border: 1px solid var(--border-color); background: white;
-      color: var(--text-dark); border-radius: 8px;
-    }
-    .btn-secondary:hover { background: #F8FAFC; }
-
-    /* Table Customization */
-    .table-pro { width: 100%; border-collapse: collapse; }
-    .table-pro th { 
-      background: #F8FAFC; color: var(--text-muted); 
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-      padding: 12px 16px; border-bottom: 2px solid var(--border-color);
-    }
-    .table-pro td { padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-    .table-pro tr:hover td { background: #F1F5F9; }
-
-    /* Progress Indicator */
-    .load-bar-bg { height: 6px; background: #E2E8F0; border-radius: 10px; width: 100px; }
-    .load-bar-fill { height: 100%; background: var(--accent); border-radius: 10px; transition: width 0.8s ease; }
-
-    .badge-status { padding: 4px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-    .badge-stable { background: #DCFCE7; color: #15803D; }
-    .badge-peak { background: #FEF3C7; color: #B45309; }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col">
-
-  <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-50">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">W</div>
-      <div>
-        <h1 class="text-lg font-bold text-slate-900 leading-tight">e-Workpermit <span class="text-blue-600">Analytics</span></h1>
-        <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Division of Labor Administration</p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-4">
-      <div class="hidden sm:flex flex-col items-end border-r pr-4 border-slate-200">
-        <span class="text-[10px] font-bold text-slate-400 uppercase">System Status</span>
-        <span class="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Live & Connected
-        </span>
-      </div>
-      <button id="fetchBtn" onclick="fetchData()" class="btn-primary px-5 py-2 text-sm flex items-center gap-2">
-        <svg id="fetchIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        Sync Data
-      </button>
-      <button onclick="exportExcel()" id="exportBtn" disabled class="btn-secondary p-2 shadow-sm" title="Download Report">
-        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <main class="max-w-[1400px] w-full mx-auto p-8 space-y-6">
-    
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="pro-card p-6">
-        <p class="kpi-label">Total Workload</p>
-        <div id="totalCases" class="kpi-value num-font">0</div>
-        <p class="text-[11px] text-slate-400 mt-1">รายการทั้งหมดในระบบ</p>
-      </div>
-      <div class="pro-card p-6">
-        <p class="kpi-label">Active Officers</p>
-        <div id="totalStaff" class="kpi-value num-font text-blue-600">0</div>
-        <p class="text-[11px] text-slate-400 mt-1">เจ้าหน้าที่ที่กำลังปฏิบัติงาน</p>
-      </div>
-      <div class="pro-card p-6">
-        <p class="kpi-label">Average Load</p>
-        <div id="avgLoad" class="kpi-value num-font text-slate-700">0</div>
-        <p class="text-[11px] text-slate-400 mt-1">ค่าเฉลี่ยงานต่อบุคคล</p>
-      </div>
-      <div class="pro-card p-6 bg-slate-900 border-none">
-        <p class="kpi-label text-slate-400">Next Sync In</p>
-        <div id="timerNum" class="kpi-value num-font text-white">60</div>
-        <p class="text-[11px] text-slate-500 mt-1">วินาที (Auto-Refresh)</p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <div class="pro-card p-6 lg:col-span-2">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Top 5 Personnel Ranking</h3>
-          <span class="text-[10px] text-slate-400 font-bold" id="lastSyncTime">Waiting...</span>
-        </div>
-        <div class="h-[320px]">
-          <canvas id="barChart"></canvas>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-6">
-        <div class="pro-card p-6 flex-1 bg-blue-50 border-blue-100">
-          <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"/></svg>
-            Executive Summary
-          </h3>
-          <div id="insightText" class="text-sm leading-relaxed text-slate-700">
-            ระบบพร้อมสำหรับการวิเคราะห์ข้อมูล โปรดกดปุ่ม <b>Sync Data</b> เพื่อเริ่มต้น...
-          </div>
-        </div>
-
-        <div class="pro-card p-6">
-          <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4">Workload Distribution</h3>
-          <div class="h-[200px] flex items-center justify-center">
-            <canvas id="doughnutChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pro-card overflow-hidden">
-      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
-        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Personnel Load Registry</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="table-pro">
-          <thead>
-            <tr>
-              <th class="w-20">Rank</th>
-              <th>Officer Name</th>
-              <th class="text-right">Cases</th>
-              <th class="w-48 pl-10">Usage</th>
-              <th class="text-center">System Alert</th>
-            </tr>
-          </thead>
-          <tbody id="dataTable">
-            <tr><td colspan="5" class="text-center py-20 text-slate-400 font-medium">No Data Available</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </main>
-
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;family=Kanit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
   <script>
-    let barChart = null, doughnutChart = null, staffData = [], timeRemaining = 60;
-    const SHEET_ID = '1ZCgi_egwYyQMnd33WjhW2g_KsFXzbkBajgj96Hn1U_g', GID = '404719184';
-
-    window.addEventListener('load', fetchDataAuto);
-
-    async function fetchData() {
-      const btn = document.getElementById('fetchBtn');
-      const icon = document.getElementById('fetchIcon');
-      btn.disabled = true; icon.classList.add('animate-spin');
-      try { await doFetch(); } finally { btn.disabled = false; icon.classList.remove('animate-spin'); startCountdown(); }
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#102a43' },
+        accent: { 50:'#fff8e1',100:'#ffecb3',200:'#ffe082',300:'#ffd54f',400:'#ffca28',500:'#ffc107',600:'#ffb300',700:'#ffa000',800:'#ff8f00',900:'#ff6f00' }
+      }
     }
+  }
+}
+</script>
+  <style>
+* { font-family: 'Sarabun', sans-serif; }
+h1,h2,h3,.brand-font { font-family: 'Kanit', sans-serif; }
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-track { background:rgba(26,35,50,0.5); }
+::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#ffc107,#ff8f00); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#ffca28,#ffb300); }
+.sidebar-item { transition: all 0.25s cubic-bezier(0.4,0,0.2,1); border-left:3px solid transparent; position:relative; overflow:hidden; }
+.sidebar-item::before { content:''; position:absolute; left:0; top:0; width:3px; height:100%; background:linear-gradient(180deg,#ffc107,#ff8f00); transform:scaleY(0); transform-origin:top; transition:transform 0.25s; }
+.sidebar-item:hover::before,.sidebar-item.active::before { transform:scaleY(1); }
+.sidebar-item:hover,.sidebar-item.active { background:rgba(255,193,7,0.1); color:#ffc107; }
+.field-label { font-size:0.75rem; font-weight:700; color:#9fb3c8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; display:block; }
+.input-field { background:linear-gradient(135deg,rgba(26,35,50,0.8),rgba(16,42,67,0.8)); border:1.5px solid #334e68; border-radius:10px; padding:12px 16px; color:#e2e8f0; font-size:0.9rem; width:100%; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow:inset 0 2px 4px rgba(0,0,0,0.2); }
+.input-field:focus { outline:none; border-color:#ffc107; box-shadow:0 0 0 4px rgba(255,193,7,0.2),inset 0 2px 4px rgba(0,0,0,0.2); background:linear-gradient(135deg,rgba(26,35,50,0.95),rgba(16,42,67,0.95)); }
+.input-field::placeholder { color:#627d98; }
+select.input-field { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffc107' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; color:var(--select-text-color,#d9e2ec); }
+select.input-field option { color:var(--select-text-color,#d9e2ec); background-color:#243b53; }
+.btn-primary { background:linear-gradient(135deg,#ffc107,#ff8f00); color:#102a43; font-weight:700; padding:11px 28px; border-radius:10px; transition:all 0.25s cubic-bezier(0.4,0,0.2,1); font-size:0.9rem; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(255,193,7,0.25); position:relative; overflow:hidden; }
+.btn-primary::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:rgba(255,255,255,0.2); transition:left 0.25s; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(255,193,7,0.35); }
+.btn-primary:hover::before { left:100%; }
+.btn-primary:active { transform:translateY(0); }
+.btn-secondary { background:linear-gradient(135deg,#334e68,#243b53); color:#e2e8f0; font-weight:600; padding:11px 28px; border-radius:10px; transition:all 0.25s cubic-bezier(0.4,0,0.2,1); font-size:0.9rem; border:1px solid #486581; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+.btn-secondary:hover { background:linear-gradient(135deg,#486581,#334e68); box-shadow:0 4px 12px rgba(255,193,7,0.15); }
+.stat-card { background:linear-gradient(135deg,rgba(36,59,83,0.8),rgba(26,35,50,0.8)); border:1.5px solid rgba(255,193,7,0.2); border-radius:14px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; right:0; width:100px; height:100px; background:radial-gradient(circle,rgba(255,193,7,0.1),transparent); border-radius:50%; }
+.stat-card:hover { border-color:rgba(255,193,7,0.4); box-shadow:0 12px 32px rgba(255,193,7,0.15); transform:translateY(-2px); }
+.data-table { width:100%; border-collapse:separate; border-spacing:0; }
+.data-table th { background:linear-gradient(90deg,#1a2332,#0f1b2a); color:#ffc107; font-weight:700; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; padding:14px 12px; text-align:left; border-bottom:2px solid rgba(255,193,7,0.3); position:sticky; top:0; z-index:1; }
+.data-table td { padding:12px; font-size:0.82rem; border-bottom:1px solid rgba(51,78,104,0.3); color:#d9e2ec; transition:all 0.2s; }
+.data-table tr:hover td { background:rgba(255,193,7,0.08); }
+.badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+.badge-pending { background:linear-gradient(135deg,rgba(255,193,7,0.2),rgba(255,202,40,0.1)); color:#ffca28; border:1px solid rgba(255,193,7,0.3); }
+.badge-processing { background:linear-gradient(135deg,rgba(96,165,250,0.2),rgba(59,130,246,0.1)); color:#60a5fa; border:1px solid rgba(96,165,250,0.3); }
+.badge-done { background:linear-gradient(135deg,rgba(52,211,153,0.2),rgba(16,185,129,0.1)); color:#34d399; border:1px solid rgba(52,211,153,0.3); }
+.search-box { position:relative; }
+.search-box input { padding-left:40px; }
+.search-box svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#ffc107; width:18px; height:18px; }
+.dropdown-list { position:absolute; z-index:50; background:linear-gradient(135deg,#1a2332,#0f1b2a); border:1.5px solid rgba(255,193,7,0.2); border-radius:10px; max-height:240px; overflow-y:auto; width:100%; box-shadow:0 12px 32px rgba(0,0,0,0.5); backdrop-filter:blur(10px); }
+.dropdown-list div { padding:10px 16px; cursor:pointer; font-size:0.85rem; color:#d9e2ec; transition:all 0.15s; border-left:3px solid transparent; }
+.dropdown-list div:hover,.dropdown-list div.highlighted { background:rgba(255,193,7,0.1); color:#ffc107; border-left-color:#ffc107; padding-left:20px; }
+.fade-in { animation: fadeIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.tooltip-info { position:relative; display:inline-flex; align-items:center; gap:4px; cursor:help; }
+.tooltip-info .tip { display:none; position:absolute; bottom:100%; left:-50%; transform:translateX(50%); background:linear-gradient(135deg,#334e68,#243b53); color:#ffc107; padding:8px 12px; border-radius:8px; font-size:0.7rem; white-space:nowrap; margin-bottom:6px; box-shadow:0 4px 12px rgba(0,0,0,0.4); border:1px solid rgba(255,193,7,0.2); animation:tipFade 0.2s; }
+.tooltip-info:hover .tip { display:block; }
+@keyframes tipFade { from{opacity:0;transform:translateX(50%) translateY(4px)} to{opacity:1;transform:translateX(50%) translateY(0)} }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-navy-900 text-navy-100 overflow-hidden">
+  <div id="app" class="h-full flex flex-col">
+   <!-- Top Header -->
+   <header class="bg-navy-800 border-b border-navy-700 px-5 py-3 flex items-center justify-between shrink-0" style="background:linear-gradient(90deg,#102a43,#243b53)">
+    <div class="flex items-center gap-3">
+     <div class="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center">
+      <svg width="22" height="22" viewbox="0 0 24 24" fill="none" stroke="#102a43" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+      </svg>
+     </div>
+     <div>
+      <h1 id="systemTitle" class="brand-font text-sm font-bold text-accent-400 leading-tight">ระบบทะเบียนคุมการบันทึกข้อมูล</h1>
+      <p class="text-xs text-navy-300">สารสนเทศแรงงานต่างด้าว · สำนักบริหารแรงงานต่างด้าว</p>
+     </div>
+    </div>
+    <div class="flex items-center gap-3">
+     <span class="text-xs text-navy-400" id="currentDateTime"></span>
+    </div>
+   </header>
+   <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <nav class="w-56 bg-navy-800 border-r border-navy-700 shrink-0 flex flex-col">
+     <div class="p-3 text-xs text-navy-400 font-semibold uppercase tracking-wider">
+      เมนูหลัก
+     </div>
+     <div class="flex-1 px-2 space-y-1">
+      <button onclick="showPage('entry')" id="nav-entry" class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="file-plus" style="width:18px;height:18px"></i> บันทึกข้อมูล </button> <button onclick="showPage('search')" id="nav-search" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="search" style="width:18px;height:18px"></i> เรียกดูข้อมูล </button>
+      <div class="pt-3 pb-1 px-3 text-xs text-navy-500 font-semibold uppercase tracking-wider">
+       รายงาน
+      </div><button onclick="showPage('report-all')" id="nav-report-all" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="bar-chart-3" style="width:18px;height:18px"></i> ข้อมูลทั้งหมด </button> <button onclick="showPage('report-staff')" id="nav-report-staff" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="users" style="width:18px;height:18px"></i> ตามเจ้าหน้าที่ </button> <button onclick="showPage('report-status')" id="nav-report-status" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="activity" style="width:18px;height:18px"></i> ตามสถานะ </button> <button onclick="showPage('report-office')" id="nav-report-office" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-left"> <i data-lucide="building" style="width:18px;height:18px"></i> ตามสำนักงาน </button>
+     </div>
+     <div class="p-3 border-t border-navy-700">
+      <p class="text-xs text-navy-500 text-center">สบต. © 2568</p>
+     </div>
+    </nav><!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-5" id="mainContent">
+     <!-- Page: Data Entry -->
+     <div id="page-entry" class="fade-in">
+      <div class="flex items-center justify-between mb-4">
+       <h2 class="brand-font text-lg font-bold text-accent-400">📋 บันทึกข้อมูลแรงงานต่างด้าว</h2>
+      </div>
+      <form id="entryForm" onsubmit="submitForm(event)" class="bg-navy-800 rounded-xl border border-navy-700 p-5">
+       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- ลำดับที่ -->
+        <div>
+         <div class="field-label tooltip-info">
+          ลำดับที่ <i data-lucide="info" style="width:12px;height:12px;color:#ffc107;cursor:help"></i> <span class="tip">🔒 ระบบจะกำหนดเลขลำดับให้อัตโนมัติ ไม่ต้องกรอก</span>
+         </div><input type="text" class="input-field bg-navy-900/50 cursor-not-allowed" value="(ระบบกำหนดอัตโนมัติ)" disabled>
+        </div><!-- เลขรับคำขอ -->
+        <div>
+         <label class="field-label" for="requestNo">เลขรับคำขอ</label> <input type="text" id="requestNo" class="input-field" placeholder="กรอกเลขรับคำขอ" required>
+        </div><!-- วันที่รับคำขอ -->
+        <div>
+         <label class="field-label" for="requestDate">วันที่รับคำขอ</label> <input type="date" id="requestDate" class="input-field" required>
+        </div><!-- ชื่อแรงงานต่างด้าว -->
+        <div>
+         <div class="field-label tooltip-info">
+          ชื่อแรงงานต่างด้าว <i data-lucide="info" style="width:12px;height:12px;color:#ffc107;cursor:help"></i> <span class="tip">🔤 กรอกได้เฉพาะภาษาอังกฤษ (จะเปลี่ยนเป็นตัวพิมพ์ใหญ่อัตโนมัติ)</span>
+         </div><input type="text" id="workerName" class="input-field" placeholder="ENGLISH ONLY" required oninput="this.value=this.value.replace(/[^a-zA-Z\s.\-]/g,'').toUpperCase()">
+        </div><!-- เลขใบอนุญาตทำงาน -->
+        <div>
+         <div class="field-label tooltip-info">
+          เลขใบอนุญาตทำงาน <i data-lucide="info" style="width:12px;height:12px;color:#ffc107;cursor:help"></i> <span class="tip">🔢 กรอกได้เฉพาะตัวเลข 13 หลัก</span>
+         </div><input type="text" id="workPermitNo" class="input-field" placeholder="ตัวเลข 13 หลัก" maxlength="13" required oninput="this.value=this.value.replace(/\D/g,'')">
+        </div><!-- หมายเลขหนังสือเดินทาง -->
+        <div>
+         <label class="field-label" for="passportNo">หมายเลขหนังสือเดินทาง</label> <input type="text" id="passportNo" class="input-field" placeholder="กรอกเลขหนังสือเดินทาง" required>
+        </div><!-- สัญชาติ -->
+        <div>
+         <label class="field-label" for="nationality">สัญชาติ</label> <select id="nationality" class="input-field" required> <option value="">-- เลือกสัญชาติ --</option> <option>เมียนมา</option><option>ลาว</option><option>กัมพูชา</option><option>เวียดนาม</option><option>จีน</option><option>อินเดีย</option><option>ฟิลิปปินส์</option><option>อื่น ๆ</option> </select>
+        </div><!-- ใบเสร็จเล่มที่ -->
+        <div>
+         <label class="field-label" for="receiptBookNo">ใบเสร็จรับเงินเล่มที่</label> <input type="text" id="receiptBookNo" class="input-field" placeholder="เลขเล่ม">
+        </div><!-- เลขที่ใบเสร็จ -->
+        <div>
+         <label class="field-label" for="receiptNo">เลขที่ใบเสร็จรับเงิน</label> <input type="text" id="receiptNo" class="input-field" placeholder="เลขที่ใบเสร็จ">
+        </div><!-- วันที่ใบเสร็จ -->
+        <div>
+         <label class="field-label" for="receiptDate">วันที่ใบเสร็จรับเงิน</label> <input type="date" id="receiptDate" class="input-field">
+        </div><!-- เลขประจำตัวนายจ้าง -->
+        <div>
+         <div class="field-label tooltip-info">
+          เลขประจำตัวนายจ้าง <i data-lucide="info" style="width:12px;height:12px;color:#ffc107;cursor:help"></i> <span class="tip">🔢 เลขบัตรประชาชน/นิติบุคคล 13 หลัก</span>
+         </div><input type="text" id="employerId" class="input-field" placeholder="ตัวเลข 13 หลัก" maxlength="13" required oninput="this.value=this.value.replace(/\D/g,'')">
+        </div><!-- ชื่อนายจ้าง -->
+        <div>
+         <label class="field-label" for="employerName">ชื่อนายจ้าง/สถานประกอบการ</label> <input type="text" id="employerName" class="input-field" placeholder="กรอกชื่อนายจ้าง" required>
+        </div><!-- ประเภทการดำเนินการ -->
+        <div>
+         <label class="field-label" for="processType">ประเภทการดำเนินการ</label> <select id="processType" class="input-field" required> <option value="">-- เลือก --</option> <option>นายจ้างดำเนินการ</option> <option>บริษัทนำคนต่างด้าวเข้ามาทำงาน</option> </select>
+        </div><!-- ยื่นเอกสารผ่านสำนักงาน -->
+        <div class="relative">
+         <label class="field-label" for="officeInput">ยื่นเอกสารผ่านสำนักงาน</label>
+         <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg><input type="text" id="officeInput" class="input-field" style="padding-left:36px" placeholder="พิมพ์เพื่อค้นหาสำนักงาน..." required autocomplete="off" oninput="filterOffices()" onfocus="filterOffices()">
+         </div>
+         <div id="officeDropdown" class="dropdown-list hidden"></div>
+        </div><!-- เจ้าหน้าที่ -->
+        <div>
+         <label class="field-label" for="staffName">เจ้าหน้าที่ผู้รับผิดชอบ</label> <select id="staffName" class="input-field" required> <option value="">-- เลือกเจ้าหน้าที่ --</option> <optgroup label="👨 ชาย"> <option>นายณภัทร ทิพยโอสถ</option> <option>นายสุทธาธิโรจน์ ยางงาม</option> <option>นายสุเมธ ยิ้มพงษ์</option> </optgroup> <optgroup label="👩 หญิง"> <option>นางสาวฐิติวรดา อินทร์ประสิทธิ์</option> <option>นางสาวนุศรา กลิ่นจุน</option> <option>นางสาวพรพัสตร์ ช่วยบำรุง</option> <option>นางสาวพัชราภา สุทธิอาจ</option> <option>นางสาวมณฑกานต์ แจ่มใจ</option> <option>นางสาวเมขลา อุดมสิริสถาพร</option> <option>นางสาวศิริปรมินทร์ ขันติคเชนชาติ</option> </optgroup> </select>
+        </div><!-- สถานะ -->
+        <div>
+         <label class="field-label" for="status">สถานะการดำเนินการ</label> <select id="status" class="input-field" required> <option value="">-- เลือกสถานะ --</option> <option>อยู่ระหว่างการตรวจสอบข้อมูล</option> <option>ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน</option> <option>ดำเนินการเสร็จสิ้น</option> </select>
+        </div><!-- หมายเหตุ -->
+        <div class="lg:col-span-2">
+         <label class="field-label" for="remark">หมายเหตุ</label> <input type="text" id="remark" class="input-field" placeholder="หมายเหตุ (ถ้ามี)">
+        </div>
+       </div>
+       <div class="flex gap-3 mt-5 pt-4 border-t border-navy-700">
+        <button type="submit" class="btn-primary flex items-center gap-2"> <i data-lucide="save" style="width:16px;height:16px"></i> บันทึกข้อมูล </button> <button type="button" onclick="resetForm()" class="btn-secondary flex items-center gap-2"> <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> ล้างฟอร์ม </button>
+       </div>
+      </form>
+     </div><!-- Page: Search/View Data -->
+     <div id="page-search" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-4">
+       <h2 class="brand-font text-lg font-bold text-accent-400">🔍 เรียกดูข้อมูลจากฐานข้อมูล</h2>
+      </div>
+      <div class="bg-navy-800 rounded-xl border border-navy-700 p-5 mb-4">
+       <div class="flex flex-wrap gap-3 items-end">
+        <div class="flex-1 min-w-[250px] relative">
+         <label class="field-label">ค้นหาจากสำนักงาน</label>
+         <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg><input type="text" id="searchOfficeInput" class="input-field" style="padding-left:36px" placeholder="พิมพ์ชื่อสำนักงานที่ต้องการค้นหา..." autocomplete="off" oninput="filterSearchOffices()" onfocus="filterSearchOffices()">
+         </div>
+         <div id="searchOfficeDropdown" class="dropdown-list hidden"></div>
+        </div><button onclick="fetchData()" class="btn-primary flex items-center gap-2"> <i data-lucide="database" style="width:16px;height:16px"></i> เรียกดูข้อมูล </button>
+       </div>
+      </div>
+      <div id="searchResults" class="bg-navy-800 rounded-xl border border-navy-700 overflow-hidden">
+       <div class="p-10 text-center text-navy-400">
+        <i data-lucide="inbox" style="width:48px;height:48px;margin:0 auto 12px;display:block;opacity:0.3"></i>
+        <p>เลือกสำนักงานและกด "เรียกดูข้อมูล" เพื่อแสดงผล</p>
+       </div>
+      </div>
+     </div><!-- Page: Report All -->
+     <div id="page-report-all" class="fade-in hidden">
+      <h2 class="brand-font text-lg font-bold text-accent-400 mb-4">📊 รายงานจำนวนรายการข้อมูลทั้งหมด</h2>
+      <div class="bg-navy-800 rounded-xl border border-navy-700 p-5 mb-4">
+       <button onclick="fetchReportAll()" class="btn-primary flex items-center gap-2"> <i data-lucide="refresh-cw" style="width:16px;height:16px"></i> โหลดรายงาน </button>
+      </div>
+      <div id="reportAllContent" class="space-y-4">
+       <div class="p-10 text-center text-navy-400 bg-navy-800 rounded-xl border border-navy-700">
+        <p>กด "โหลดรายงาน" เพื่อแสดงผล</p>
+       </div>
+      </div>
+     </div><!-- Page: Report Staff -->
+     <div id="page-report-staff" class="fade-in hidden">
+      <h2 class="brand-font text-lg font-bold text-accent-400 mb-4">👥 รายงานจำนวนรายการตามเจ้าหน้าที่</h2>
+      <div class="bg-navy-800 rounded-xl border border-navy-700 p-5 mb-4">
+       <button onclick="fetchReportStaff()" class="btn-primary flex items-center gap-2"> <i data-lucide="refresh-cw" style="width:16px;height:16px"></i> โหลดรายงาน </button>
+      </div>
+      <div id="reportStaffContent">
+       <div class="p-10 text-center text-navy-400 bg-navy-800 rounded-xl border border-navy-700">
+        <p>กด "โหลดรายงาน" เพื่อแสดงผล</p>
+       </div>
+      </div>
+     </div><!-- Page: Report Status -->
+     <div id="page-report-status" class="fade-in hidden">
+      <h2 class="brand-font text-lg font-bold text-accent-400 mb-4">📈 รายงานจำนวนรายการตามสถานะ</h2>
+      <div class="bg-navy-800 rounded-xl border border-navy-700 p-5 mb-4">
+       <button onclick="fetchReportStatus()" class="btn-primary flex items-center gap-2"> <i data-lucide="refresh-cw" style="width:16px;height:16px"></i> โหลดรายงาน </button>
+      </div>
+      <div id="reportStatusContent">
+       <div class="p-10 text-center text-navy-400 bg-navy-800 rounded-xl border border-navy-700">
+        <p>กด "โหลดรายงาน" เพื่อแสดงผล</p>
+       </div>
+      </div>
+     </div><!-- Page: Report Office -->
+     <div id="page-report-office" class="fade-in hidden">
+      <h2 class="brand-font text-lg font-bold text-accent-400 mb-4">🏢 รายงานจำนวนรายการตามสำนักงาน</h2>
+      <div class="bg-navy-800 rounded-xl border border-navy-700 p-5 mb-4">
+       <button onclick="fetchReportOffice()" class="btn-primary flex items-center gap-2"> <i data-lucide="refresh-cw" style="width:16px;height:16px"></i> โหลดรายงาน </button>
+      </div>
+      <div id="reportOfficeContent">
+       <div class="p-10 text-center text-navy-400 bg-navy-800 rounded-xl border border-navy-700">
+        <p>กด "โหลดรายงาน" เพื่อแสดงผล</p>
+       </div>
+      </div>
+     </div>
+    </main>
+   </div>
+  </div>
+  <script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbya_yDjQgtn8yy3DbrusZ2KzQra9uiyntNR78VHzIPVnqyon4X68-y7xyp0m82Ku0c2/exec';
 
-    async function fetchDataAuto() { try { await doFetch(); startCountdown(); } catch(e) { startCountdown(); } }
+const OFFICES = ["สจก.พื้นที่ 1","สจก.พื้นที่ 2","สจก.พื้นที่ 3","สจก.พื้นที่ 4","สจก.พื้นที่ 5","สจก.พื้นที่ 6","สจก.พื้นที่ 7","สจก.พื้นที่ 8","สจก.พื้นที่ 9","สจก.พื้นที่ 10","สจจ.กระบี่","สจจ.กาญจนบุรี","สจจ.กาฬสินธุ์","สจจ.กำแพงเพชร","สจจ.ขอนแก่น","สจจ.จันทบุรี","สจจ.ฉะเชิงเทรา","สจจ.ชลบุรี","สจจ.ชัยนาท","สจจ.ชัยภูมิ","สจจ.ชุมพร","สจจ.เชียงราย","สจจ.เชียงใหม่","สจจ.ตรัง","สจจ.ตราด","สจจ.ตาก","สจจ.นครนายก","สจจ.นครปฐม","สจจ.นครพนม","สจจ.นครราชสีมา","สจจ.นครศรีธรรมราช","สจจ.นครสวรรค์","สจจ.นนทบุรี","สจจ.นราธิวาส","สจจ.น่าน","สจจ.บึงกาฬ","สจจ.บุรีรัมย์","สจจ.ปทุมธานี","สจจ.ประจวบคีรีขันธ์","สจจ.ปราจีนบุรี","สจจ.ปัตตานี","สจจ.พระนครศรีอยุธยา","สจจ.พะเยา","สจจ.พังงา","สจจ.พัทลุง","สจจ.พิจิตร","สจจ.พิษณุโลก","สจจ.เพชรบุรี","สจจ.เพชรบูรณ์","สจจ.แพร่","สจจ.ภูเก็ต","สจจ.มหาสารคาม","สจจ.มุกดาหาร","สจจ.แม่ฮ่องสอน","สจจ.ยโสธร","สจจ.ยะลา","สจจ.ร้อยเอ็ด","สจจ.ระนอง","สจจ.ระยอง","สจจ.ราชบุรี","สจจ.ลพบุรี","สจจ.ลำปาง","สจจ.ลำพูน","สจจ.เลย","สจจ.ศรีสะเกษ","สจจ.สกลนคร","สจจ.สงขลา","สจจ.สตูล","สจจ.สมุทรปราการ","สจจ.สมุทรสงคราม","สจจ.สมุทรสาคร","สจจ.สระแก้ว","สจจ.สระบุรี","สจจ.สิงห์บุรี","สจจ.สุโขทัย","สจจ.สุพรรณบุรี","สจจ.สุราษฎร์ธานี","สจจ.สุรินทร์","สจจ.หนองคาย","สจจ.หนองบัวลำภู","สจจ.อ่างทอง","สจจ.อุดรธานี","สจจ.อุตรดิตถ์","สจจ.อุทัยธานี","สจจ.อุบลราชธานี","สจจ.อำนาจเจริญ"];
 
-    async function doFetch() {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
-      const res = await fetch(url);
-      const text = await res.text();
-      const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
-      const counts = {};
-      json.table.rows.forEach(r => { if(r.c && r.c[0]) { const val = r.c[0].v; if(val) counts[val] = (counts[val]||0)+1; }});
-      staffData = Object.entries(counts).map(([name, count]) => ({name, count})).sort((a,b) => b.count-a.count);
-      updateDashboard();
+// Element SDK
+const defaultConfig = {
+  system_title: 'ระบบทะเบียนคุมการบันทึกข้อมูล',
+  background_color: '#102a43',
+  surface_color: '#243b53',
+  text_color: '#d9e2ec',
+  primary_action_color: '#ffc107',
+  secondary_action_color: '#486581',
+  select_text_color: '#d9e2ec',
+  font_family: 'Sarabun',
+  font_size: 14
+};
+
+if (window.elementSdk) {
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange: async (config) => {
+      const t = config.system_title || defaultConfig.system_title;
+      document.getElementById('systemTitle').textContent = t;
+      document.documentElement.style.setProperty('--bg', config.background_color || defaultConfig.background_color);
+      document.documentElement.style.setProperty('--surface', config.surface_color || defaultConfig.surface_color);
+      document.documentElement.style.setProperty('--text', config.text_color || defaultConfig.text_color);
+      document.documentElement.style.setProperty('--accent', config.primary_action_color || defaultConfig.primary_action_color);
+      document.documentElement.style.setProperty('--select-text-color', config.select_text_color || defaultConfig.select_text_color);
+      const font = config.font_family || defaultConfig.font_family;
+      document.body.style.fontFamily = `${font}, Sarabun, sans-serif`;
+      const sz = config.font_size || defaultConfig.font_size;
+      document.body.style.fontSize = sz + 'px';
+    },
+    mapToCapabilities: (config) => ({
+      recolorables: [
+        { get:()=>config.background_color||defaultConfig.background_color, set:(v)=>{config.background_color=v;window.elementSdk.setConfig({background_color:v})} },
+        { get:()=>config.surface_color||defaultConfig.surface_color, set:(v)=>{config.surface_color=v;window.elementSdk.setConfig({surface_color:v})} },
+        { get:()=>config.text_color||defaultConfig.text_color, set:(v)=>{config.text_color=v;window.elementSdk.setConfig({text_color:v})} },
+        { get:()=>config.primary_action_color||defaultConfig.primary_action_color, set:(v)=>{config.primary_action_color=v;window.elementSdk.setConfig({primary_action_color:v})} },
+        { get:()=>config.secondary_action_color||defaultConfig.secondary_action_color, set:(v)=>{config.secondary_action_color=v;window.elementSdk.setConfig({secondary_action_color:v})} },
+        { get:()=>config.select_text_color||defaultConfig.select_text_color, set:(v)=>{config.select_text_color=v;window.elementSdk.setConfig({select_text_color:v})} },
+      ],
+      borderables: [],
+      fontEditable: { get:()=>config.font_family||defaultConfig.font_family, set:(v)=>{config.font_family=v;window.elementSdk.setConfig({font_family:v})} },
+      fontSizeable: { get:()=>config.font_size||defaultConfig.font_size, set:(v)=>{config.font_size=v;window.elementSdk.setConfig({font_size:v})} }
+    }),
+    mapToEditPanelValues: (config) => new Map([
+      ["system_title", config.system_title || defaultConfig.system_title]
+    ])
+  });
+}
+
+// Navigation
+function showPage(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) { el.classList.remove('hidden'); }
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+}
+
+// Office dropdown for entry form
+function filterOffices() {
+  const input = document.getElementById('officeInput');
+  const dd = document.getElementById('officeDropdown');
+  const val = input.value.toLowerCase();
+  const filtered = OFFICES.filter(o => o.toLowerCase().includes(val));
+  if (filtered.length === 0 || (filtered.length === 1 && filtered[0] === input.value)) {
+    dd.classList.add('hidden'); return;
+  }
+  dd.innerHTML = filtered.map(o => `<div onclick="selectOffice('${o}')">${o}</div>`).join('');
+  dd.classList.remove('hidden');
+}
+function selectOffice(o) {
+  document.getElementById('officeInput').value = o;
+  document.getElementById('officeDropdown').classList.add('hidden');
+}
+
+// Office dropdown for search
+function filterSearchOffices() {
+  const input = document.getElementById('searchOfficeInput');
+  const dd = document.getElementById('searchOfficeDropdown');
+  const val = input.value.toLowerCase();
+  const filtered = OFFICES.filter(o => o.toLowerCase().includes(val));
+  if (filtered.length === 0 || (filtered.length === 1 && filtered[0] === input.value)) {
+    dd.classList.add('hidden'); return;
+  }
+  dd.innerHTML = filtered.map(o => `<div onclick="selectSearchOffice('${o}')">${o}</div>`).join('');
+  dd.classList.remove('hidden');
+}
+function selectSearchOffice(o) {
+  document.getElementById('searchOfficeInput').value = o;
+  document.getElementById('searchOfficeDropdown').classList.add('hidden');
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#officeInput') && !e.target.closest('#officeDropdown'))
+    document.getElementById('officeDropdown').classList.add('hidden');
+  if (!e.target.closest('#searchOfficeInput') && !e.target.closest('#searchOfficeDropdown'))
+    document.getElementById('searchOfficeDropdown').classList.add('hidden');
+});
+
+// JSONP helper
+let jsonpCounter = 0;
+function jsonpRequest(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_jsonpCb_' + (++jsonpCounter) + '_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 30000);
+    function cleanup() { clearTimeout(timeout); delete window[cbName]; if(script.parentNode) script.parentNode.removeChild(script); }
+    window[cbName] = (data) => { cleanup(); resolve(data); };
+    const sep = url.includes('?') ? '&' : '?';
+    script.src = url + sep + 'callback=' + cbName;
+    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
+    document.body.appendChild(script);
+  });
+}
+
+// Submit form
+async function submitForm(e) {
+  e.preventDefault();
+  // Validate 13 digits
+  const wp = document.getElementById('workPermitNo').value;
+  const eid = document.getElementById('employerId').value;
+  if (wp.length !== 13) { Swal.fire({icon:'warning',title:'ข้อมูลไม่ถูกต้อง',text:'เลขใบอนุญาตทำงานต้องมี 13 หลัก',background:'#243b53',color:'#d9e2ec'}); return; }
+  if (eid.length !== 13) { Swal.fire({icon:'warning',title:'ข้อมูลไม่ถูกต้อง',text:'เลขประจำตัวนายจ้างต้องมี 13 หลัก',background:'#243b53',color:'#d9e2ec'}); return; }
+
+  const now = new Date();
+  const thaiDate = now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}) + ' ' + now.toLocaleTimeString('th-TH');
+
+  const data = {
+    action: 'create',
+    requestNo: document.getElementById('requestNo').value,
+    requestDate: document.getElementById('requestDate').value,
+    workerName: document.getElementById('workerName').value,
+    workPermitNo: wp,
+    passportNo: document.getElementById('passportNo').value,
+    nationality: document.getElementById('nationality').value,
+    receiptBookNo: document.getElementById('receiptBookNo').value,
+    receiptNo: document.getElementById('receiptNo').value,
+    receiptDate: document.getElementById('receiptDate').value,
+    employerId: eid,
+    employerName: document.getElementById('employerName').value,
+    processType: document.getElementById('processType').value,
+    office: document.getElementById('officeInput').value,
+    staffName: document.getElementById('staffName').value,
+    status: document.getElementById('status').value,
+    remark: document.getElementById('remark').value,
+    lastStatusDate: thaiDate
+  };
+
+  Swal.fire({ title:'กำลังบันทึกข้อมูล...', text:'กรุณารอสักครู่', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+
+  try {
+    const params = new URLSearchParams(data).toString();
+    const result = await jsonpRequest(GAS_URL + '?' + params);
+    if (result && result.status === 'success') {
+      Swal.fire({ icon:'success', title:'บันทึกสำเร็จ!', text:'ลำดับที่ ' + (result.rowNumber || '-'), background:'#243b53', color:'#d9e2ec', confirmButtonColor:'#ffc107', confirmButtonText:'ตกลง' });
+      resetForm();
+    } else {
+      Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: (result && result.message) || 'ไม่สามารถบันทึกได้', background:'#243b53', color:'#d9e2ec' });
     }
+  } catch(err) {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: err.message, background:'#243b53', color:'#d9e2ec' });
+  }
+}
 
-    function updateDashboard() {
-      const total = staffData.reduce((s, d) => s + d.count, 0);
-      const avg = staffData.length > 0 ? Math.round(total / staffData.length) : 0;
-      
-      document.getElementById('totalCases').textContent = total.toLocaleString();
-      document.getElementById('totalStaff').textContent = staffData.length;
-      document.getElementById('avgLoad').textContent = avg;
-      document.getElementById('exportBtn').disabled = false;
-      document.getElementById('lastSyncTime').textContent = `Last Sync: ${new Date().toLocaleTimeString()}`;
-      
-      renderCharts(total);
-      renderTable(avg, total);
-      updateInsight(total, avg);
+function resetForm() {
+  document.getElementById('entryForm').reset();
+}
+
+// Fetch data for search
+async function fetchData() {
+  const office = document.getElementById('searchOfficeInput').value;
+  if (!office) { Swal.fire({icon:'warning',title:'กรุณาเลือกสำนักงาน',background:'#243b53',color:'#d9e2ec'}); return; }
+  
+  Swal.fire({ title:'กำลังโหลดข้อมูล...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+
+  try {
+    const result = await jsonpRequest(GAS_URL + '?action=read&office=' + encodeURIComponent(office));
+    Swal.close();
+    if (result && result.status === 'success') {
+      renderSearchResults(result.data || []);
+    } else {
+      document.getElementById('searchResults').innerHTML = '<div class="p-10 text-center text-red-400">ไม่สามารถโหลดข้อมูลได้</div>';
     }
+  } catch(err) {
+    Swal.close();
+    document.getElementById('searchResults').innerHTML = '<div class="p-10 text-center text-red-400">เกิดข้อผิดพลาด: ' + err.message + '</div>';
+  }
+}
 
-    function renderCharts(total) {
-      const top5 = staffData.slice(0, 5);
-      
-      // Horizontal Bar Chart
-      const bCtx = document.getElementById('barChart').getContext('2d');
-      if(barChart) barChart.destroy();
-      barChart = new Chart(bCtx, {
-        type: 'bar',
-        data: {
-          labels: top5.map(d => d.name.split(' ')[0]),
-          datasets: [{ 
-            data: top5.map(d => d.count), 
-            backgroundColor: '#2563EB', 
-            borderRadius: 4,
-            barThickness: 24
-          }]
-        },
-        options: { 
-          indexAxis: 'y', 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          plugins: { legend: { display: false } },
-          scales: { 
-            x: { grid: { color: '#F1F5F9' }, ticks: { font: { family: 'Inter', size: 11 } } },
-            y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
-          }
-        }
+function renderSearchResults(data) {
+  const container = document.getElementById('searchResults');
+  if (!data.length) {
+    container.innerHTML = '<div class="p-10 text-center text-navy-400"><p>ไม่พบข้อมูล</p></div>';
+    return;
+  }
+  let html = `<div class="p-3 text-sm text-navy-300">พบ <span class="text-accent-400 font-bold">${data.length}</span> รายการ</div>
+  <div class="overflow-x-auto"><table class="data-table"><thead><tr>
+    <th>ลำดับ</th><th>เลขรับคำขอ</th><th>วันที่</th><th>ชื่อแรงงาน</th><th>สัญชาติ</th><th>นายจ้าง</th><th>เจ้าหน้าที่</th><th>สถานะ</th><th>วันที่แจ้งสถานะ</th><th>จัดการ</th>
+  </tr></thead><tbody>`;
+  data.forEach((row, i) => {
+    const badgeClass = row.status === 'ดำเนินการเสร็จสิ้น' ? 'badge-done' : row.status === 'ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน' ? 'badge-processing' : 'badge-pending';
+    html += `<tr id="row-${row.rowIndex}">
+      <td>${row.seq || i+1}</td>
+      <td>${row.requestNo||''}</td>
+      <td class="whitespace-nowrap">${row.requestDate||''}</td>
+      <td>${row.workerName||''}</td>
+      <td>${row.nationality||''}</td>
+      <td>${row.employerName||''}</td>
+      <td>${row.staffName||''}</td>
+      <td><select class="input-field text-xs py-1 px-2" id="status-${row.rowIndex}" style="min-width:180px">
+        <option ${row.status==='อยู่ระหว่างการตรวจสอบข้อมูล'?'selected':''}>อยู่ระหว่างการตรวจสอบข้อมูล</option>
+        <option ${row.status==='ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน'?'selected':''}>ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน</option>
+        <option ${row.status==='ดำเนินการเสร็จสิ้น'?'selected':''}>ดำเนินการเสร็จสิ้น</option>
+      </select></td>
+      <td class="whitespace-nowrap text-xs">${row.lastStatusDate||''}</td>
+      <td><button onclick="updateStatus(${row.rowIndex})" class="btn-primary text-xs py-1 px-3">บันทึก</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+async function updateStatus(rowIndex) {
+  const newStatus = document.getElementById('status-' + rowIndex).value;
+  const now = new Date();
+  const thaiDate = now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}) + ' ' + now.toLocaleTimeString('th-TH');
+
+  Swal.fire({ title:'กำลังอัปเดตสถานะ...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+
+  try {
+    const params = `action=updateStatus&rowIndex=${rowIndex}&status=${encodeURIComponent(newStatus)}&lastStatusDate=${encodeURIComponent(thaiDate)}`;
+    const result = await jsonpRequest(GAS_URL + '?' + params);
+    if (result && result.status === 'success') {
+      Swal.fire({ icon:'success', title:'อัปเดตสำเร็จ!', background:'#243b53', color:'#d9e2ec', confirmButtonColor:'#ffc107', timer:1500, showConfirmButton:false });
+      fetchData(); // Refresh
+    } else {
+      Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:(result&&result.message)||'', background:'#243b53', color:'#d9e2ec' });
+    }
+  } catch(err) {
+    Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text:err.message, background:'#243b53', color:'#d9e2ec' });
+  }
+}
+
+// Reports
+async function fetchReportAll() {
+  Swal.fire({ title:'กำลังโหลดรายงาน...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+  try {
+    const result = await jsonpRequest(GAS_URL + '?action=reportAll');
+    Swal.close();
+    if (result && result.status === 'success') {
+      const d = result.data;
+      document.getElementById('reportAllContent').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="stat-card text-center"><p class="text-navy-400 text-sm">จำนวนรายการทั้งหมด</p><p class="text-4xl font-bold text-accent-400 brand-font mt-2">${d.total||0}</p></div>
+          <div class="stat-card text-center"><p class="text-navy-400 text-sm">อยู่ระหว่างดำเนินการ</p><p class="text-4xl font-bold text-yellow-400 brand-font mt-2">${d.pending||0}</p></div>
+          <div class="stat-card text-center"><p class="text-navy-400 text-sm">ดำเนินการเสร็จสิ้น</p><p class="text-4xl font-bold text-green-400 brand-font mt-2">${d.done||0}</p></div>
+        </div>`;
+    }
+  } catch(err) { Swal.close(); document.getElementById('reportAllContent').innerHTML = '<div class="p-5 text-red-400">เกิดข้อผิดพลาด</div>'; }
+}
+
+async function fetchReportStaff() {
+  Swal.fire({ title:'กำลังโหลดรายงาน...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+  try {
+    const result = await jsonpRequest(GAS_URL + '?action=reportByStaff');
+    Swal.close();
+    if (result && result.status === 'success') {
+      let html = '<div class="bg-navy-800 rounded-xl border border-navy-700 overflow-hidden"><table class="data-table"><thead><tr><th>เจ้าหน้าที่</th><th class="text-center">จำนวนรายการ</th></tr></thead><tbody>';
+      (result.data||[]).forEach(r => { html += `<tr><td>${r.name}</td><td class="text-center"><span class="badge badge-pending">${r.count}</span></td></tr>`; });
+      html += '</tbody></table></div>';
+      document.getElementById('reportStaffContent').innerHTML = html;
+    }
+  } catch(err) { Swal.close(); }
+}
+
+async function fetchReportStatus() {
+  Swal.fire({ title:'กำลังโหลดรายงาน...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+  try {
+    const result = await jsonpRequest(GAS_URL + '?action=reportByStatus');
+    Swal.close();
+    if (result && result.status === 'success') {
+      let html = '<div class="bg-navy-800 rounded-xl border border-navy-700 overflow-hidden"><table class="data-table"><thead><tr><th>สถานะ</th><th class="text-center">จำนวนรายการ</th></tr></thead><tbody>';
+      (result.data||[]).forEach(r => {
+        const bc = r.status.includes('เสร็จสิ้น')?'badge-done':r.status.includes('รอแจ้ง')?'badge-processing':'badge-pending';
+        html += `<tr><td><span class="badge ${bc}">${r.status}</span></td><td class="text-center font-bold text-accent-400">${r.count}</td></tr>`;
       });
-
-      // Doughnut
-      const dCtx = document.getElementById('doughnutChart').getContext('2d');
-      if(doughnutChart) doughnutChart.destroy();
-      doughnutChart = new Chart(dCtx, {
-        type: 'doughnut',
-        data: {
-          labels: [...top5.map(d => d.name.split(' ')[0]), 'Others'],
-          datasets: [{ 
-            data: [...top5.map(d => d.count), total - top5.reduce((s,d)=>s+d.count,0)],
-            backgroundColor: ['#1E293B', '#334155', '#475569', '#64748B', '#94A3B8', '#E2E8F0'],
-            borderWidth: 2, borderColor: '#fff'
-          }]
-        },
-        options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
+      html += '</tbody></table></div>';
+      document.getElementById('reportStatusContent').innerHTML = html;
     }
+  } catch(err) { Swal.close(); }
+}
 
-    function renderTable(avg, total) {
-      const tbody = document.getElementById('dataTable');
-      tbody.innerHTML = staffData.map((s, i) => {
-        const pct = ((s.count/total)*100).toFixed(1);
-        const warn = s.count > avg * 1.2;
-        return `
-          <tr>
-            <td class="num-font text-slate-400 font-bold">#${(i+1).toString().padStart(2,'0')}</td>
-            <td class="font-bold text-slate-800">${s.name}</td>
-            <td class="text-right num-font font-bold text-slate-900">${s.count}</td>
-            <td class="pl-10">
-              <div class="flex items-center gap-3">
-                <div class="load-bar-bg"><div class="load-bar-fill" style="width: ${pct}%; background: ${warn?'#F59E0B':'#2563EB'}"></div></div>
-                <span class="text-[10px] num-font font-bold text-slate-400">${pct}%</span>
-              </div>
-            </td>
-            <td class="text-center">
-              <span class="badge-status ${warn?'badge-peak':'badge-stable'}">
-                ${warn?'High Load':'Optimal'}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join('');
+async function fetchReportOffice() {
+  Swal.fire({ title:'กำลังโหลดรายงาน...', allowOutsideClick:false, background:'#243b53', color:'#d9e2ec', didOpen:()=>Swal.showLoading() });
+  try {
+    const result = await jsonpRequest(GAS_URL + '?action=reportByOffice');
+    Swal.close();
+    if (result && result.status === 'success') {
+      let html = '<div class="bg-navy-800 rounded-xl border border-navy-700 overflow-hidden"><table class="data-table"><thead><tr><th>สำนักงาน</th><th class="text-center">จำนวนรายการ</th></tr></thead><tbody>';
+      (result.data||[]).forEach(r => { html += `<tr><td>${r.office}</td><td class="text-center font-bold text-accent-400">${r.count}</td></tr>`; });
+      html += '</tbody></table></div>';
+      document.getElementById('reportOfficeContent').innerHTML = html;
     }
+  } catch(err) { Swal.close(); }
+}
 
-    function updateInsight(total, avg) {
-      const top = staffData[0];
-      const top5sum = staffData.slice(0,5).reduce((s,d)=>s+d.count,0);
-      document.getElementById('insightText').innerHTML = `
-        จากการวิเคราะห์พบว่า <b>กลุ่ม Top 5</b> รับผิดชอบภาระงานรวมคิดเป็น <b>${((top5sum/total)*100).toFixed(1)}%</b> ของปริมาณงานทั้งระบบ <br><br>
-        ผู้ที่แบกรับภาระงานสูงสุดคือ <b>คุณ${top.name.split(' ')[0]}</b> (${top.count} รายการ) ซึ่งสูงกว่าค่าเฉลี่ยกลางของทีมประมาณ <b>${(top.count/avg).toFixed(1)} เท่า</b> ควรพิจารณาบริหารจัดการทรัพยากรบุคคลเพิ่มเติม
-      `;
-    }
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('currentDateTime').textContent = now.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' ' + now.toLocaleTimeString('th-TH');
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-    function startCountdown() {
-      timeRemaining = 60;
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(() => {
-        timeRemaining--;
-        document.getElementById('timerNum').textContent = timeRemaining;
-        if (timeRemaining <= 0) { clearInterval(countdownInterval); fetchDataAuto(); }
-      }, 1000);
-    }
-
-    function exportExcel() {
-      const ws = XLSX.utils.json_to_sheet(staffData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "WorkloadReport");
-      XLSX.writeFile(wb, `EWP_Executive_Report_${new Date().getTime()}.xlsx`);
-    }
-  </script>
-</body>
+// Init Lucide
+lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e8e22bee6773d80',t:'MTc3NTYxODQyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
