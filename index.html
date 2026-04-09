@@ -159,7 +159,8 @@ label { transition: color 0.2s; }
         <div><label for="work_permit" class="block text-sm font-semibold text-navy-800 mb-1">เลขใบอนุญาตทำงาน <span class="text-red-500">*</span></label> <input id="work_permit" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
          <p class="text-[10px] text-navy-400 mt-0.5">กรอกตัวเลข 13 หลักเท่านั้น</p>
         </div>
-        <div><label for="passport_no" class="block text-sm font-semibold text-navy-800 mb-1">หมายเลขหนังสือเดินทาง <span class="text-red-500">*</span></label> <input id="passport_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        <div><label for="passport_no" class="block text-sm font-semibold text-navy-800 mb-1">หมายเลขหนังสือเดินทาง <span class="text-red-500">*</span></label> <input id="passport_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none uppercase" oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()">
+         <p class="text-[10px] text-navy-400 mt-0.5">ตัวอักษรและตัวเลขเท่านั้น (ระบบแปลงเป็นพิมพ์ใหญ่อัตโนมัติ)</p>
         </div>
        </div><!-- Row 3 -->
        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -206,7 +207,7 @@ label { transition: color 0.2s; }
       <div class="p-6">
        <div class="flex gap-3 mb-4 items-end flex-col">
         <div class="w-full"><label for="fetchOffice" class="block text-sm font-semibold text-navy-800 mb-1">ค้นหาจากสำนักงาน</label>
-         <div class="flex gap-3"><input id="fetchOffice" type="text" list="officeList2" class="form-input flex-1 px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์ชื่อสำนักงาน..."> <datalist id="officeList2"></datalist> <button onclick="fetchData()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="download" class="w-4 h-4"></i>เรียกดูข้อมูล </button>
+         <div class="flex gap-3"><input id="fetchOffice" type="text" list="officeList2" class="form-input flex-1 px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์ชื่อสำนักงาน..."> <datalist id="officeList2"></datalist> <button onclick="fetchData()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="download" class="w-4 h-4"></i>เรียกดูข้อมูล </button> <button onclick="clearAllData()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="trash-2" class="w-4 h-4"></i>ล้างข้อมูล </button>
          </div>
         </div>
         <div id="fetchResult" class="w-full text-sm text-navy-500 text-center py-8">
@@ -415,6 +416,37 @@ function renderFetchResult(data) {
 
 function esc(s) { if(!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
+function clearAllData() {
+  Swal.fire({
+    title: 'ยืนยันการล้างข้อมูล',
+    text: 'คุณต้องการล้างข้อมูลที่ค้นหา และฟอร์มบันทึกข้อมูล ใช่หรือไม่?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'ใช่ ล้างข้อมูล',
+    cancelButtonText: 'ยกเลิก',
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#243b53'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Clear fetch form
+      document.getElementById('fetchOffice').value = '';
+      document.getElementById('fetchResult').innerHTML = '<p class="text-navy-400 py-8">กรุณาเลือกสำนักงานแล้วกดเรียกดูข้อมูล</p>';
+      
+      // Clear entry form
+      document.getElementById('entryForm').reset();
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'ล้างข้อมูลสำเร็จ',
+        text: 'ข้อมูลทั้งหมดถูกล้างเรียบร้อยแล้ว',
+        confirmButtonColor: '#243b53',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+  });
+}
+
 async function updateStatus(rowNum) {
   const sel = document.getElementById('status-' + rowNum);
   if(!sel) return;
@@ -554,5 +586,5 @@ if (window.elementSdk) {
 populateOffices();
 lucide.createIcons();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e8e783f3328f8f0',t:'MTc3NTYyMTkyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e95e8ac4359a1c0',t:'MTc3NTY5OTkyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
