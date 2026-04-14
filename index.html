@@ -114,11 +114,13 @@ label { transition: color 0.2s; }
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full bg-navy-50">
-  <div id="app" class="h-full flex overflow-hidden"><!-- Sidebar -->
+  <div id="app" class="h-full flex overflow-hidden">
+   <!-- Sidebar -->
    <aside class="w-64 bg-gradient-to-b from-navy-900 to-navy-800 text-white flex flex-col flex-shrink-0">
     <div class="p-4 border-b border-navy-700">
      <div class="flex items-center gap-2 mb-2">
-      <div class="w-10 h-10 rounded-lg bg-gold-500 flex items-center justify-center"><i data-lucide="building-2" class="w-5 h-5 text-navy-900"></i>
+      <div class="w-10 h-10 rounded-lg bg-gold-500 flex items-center justify-center">
+       <i data-lucide="building-2" class="w-5 h-5 text-navy-900"></i>
       </div>
       <div class="text-xs leading-tight font-semibold">
        สำนักบริหาร<br>
@@ -127,7 +129,8 @@ label { transition: color 0.2s; }
      </div>
      <p class="text-[10px] text-navy-300 leading-tight">ระบบทะเบียนคุมการบันทึกข้อมูลสารสนเทศแรงงานต่างด้าว</p>
     </div>
-    <nav class="flex-1 p-3 space-y-1"><button onclick="showPage('entry')" id="nav-entry" class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="file-plus" class="w-4 h-4"></i>บันทึกข้อมูล </button> <button onclick="showPage('fetch')" id="nav-fetch" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="search" class="w-4 h-4"></i>เรียกดูข้อมูล </button>
+    <nav class="flex-1 p-3 space-y-1">
+     <button onclick="showPage('entry')" id="nav-entry" class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="file-plus" class="w-4 h-4"></i>บันทึกข้อมูล </button> <button onclick="showPage('fetch')" id="nav-fetch" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="search" class="w-4 h-4"></i>เรียกดูข้อมูล </button>
      <div class="pt-2 pb-1 px-3 text-[10px] text-navy-400 uppercase tracking-wider font-semibold">
       รายงาน
      </div><button onclick="showPage('report-all')" id="nav-report-all" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="bar-chart-3" class="w-4 h-4"></i>จำนวนรายการทั้งหมด </button> <button onclick="showPage('report-staff')" id="nav-report-staff" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="users" class="w-4 h-4"></i>ตามเจ้าหน้าที่ </button> <button onclick="showPage('report-status')" id="nav-report-status" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="activity" class="w-4 h-4"></i>ตามสถานะ </button> <button onclick="showPage('report-office')" id="nav-report-office" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left"> <i data-lucide="map-pin" class="w-4 h-4"></i>ตามสำนักงาน </button>
@@ -136,65 +139,89 @@ label { transition: color 0.2s; }
      © สำนักบริหารแรงงานต่างด้าว
     </div>
    </aside><!-- Main -->
-   <main class="flex-1 overflow-auto p-6"><!-- PAGE: ENTRY -->
+   <main class="flex-1 overflow-auto p-6">
+    <!-- PAGE: ENTRY -->
     <div id="page-entry" class="fade-in max-w-5xl mx-auto">
      <div class="bg-white rounded-2xl shadow-lg border border-navy-100 overflow-hidden card-elevated">
       <div class="header-gradient px-6 py-5 border-b-4 border-gold-500">
        <h1 id="mainTitle" class="text-xl font-bold text-white flex items-center gap-3"><i data-lucide="file-plus" class="w-6 h-6 text-gold-400"></i> แบบฟอร์มบันทึกข้อมูลสารสนเทศแรงงานต่างด้าว</h1>
       </div>
-      <form id="entryForm" class="p-6 space-y-5" onsubmit="submitForm(event)"><!-- Row 1 -->
+      <form id="entryForm" class="p-6 space-y-5" onsubmit="submitForm(event)">
+       <!-- Row 1 -->
        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div><label class="block text-sm font-semibold text-navy-800 mb-1">ลำดับที่</label> <input type="text" disabled value="(ระบบกำหนดให้อัตโนมัติ)" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm bg-navy-50 text-navy-400 cursor-not-allowed">
+        <div>
+         <label class="block text-sm font-semibold text-navy-800 mb-1">ลำดับที่</label> <input type="text" disabled value="(ระบบกำหนดให้อัตโนมัติ)" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm bg-navy-50 text-navy-400 cursor-not-allowed">
          <p class="text-[10px] text-gold-600 mt-0.5">* ไม่ต้องกรอก ระบบจะบันทึกลำดับให้อัตโนมัติ</p>
         </div>
-        <div><label for="request_no" class="block text-sm font-semibold text-navy-800 mb-1">เลขรับคำขอ <span class="text-red-500">*</span></label> <input id="request_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        <div>
+         <label for="request_no" class="block text-sm font-semibold text-navy-800 mb-1">เลขรับคำขอ <span class="text-red-500">*</span></label> <input id="request_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
         </div>
-        <div><label for="request_date" class="block text-sm font-semibold text-navy-800 mb-1">วันที่รับคำขอ <span class="text-red-500">*</span></label> <input id="request_date" type="date" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        <div>
+         <label for="request_date" class="block text-sm font-semibold text-navy-800 mb-1">วันที่รับคำขอ <span class="text-red-500">*</span></label> <input id="request_date" type="date" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
         </div>
        </div><!-- Row 2 -->
        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div><label for="worker_name" class="block text-sm font-semibold text-navy-800 mb-1">ชื่อแรงงานต่างด้าว <span class="text-red-500">*</span></label> <input id="worker_name" type="text" required pattern="[A-Za-z\s\.\-]+" title="กรุณากรอกเป็นภาษาอังกฤษเท่านั้น" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none uppercase" oninput="this.value=this.value.replace(/[^A-Za-z\s\.\-]/g,'').toUpperCase()">
+        <div>
+         <label for="worker_name" class="block text-sm font-semibold text-navy-800 mb-1">ชื่อแรงงานต่างด้าว <span class="text-red-500">*</span></label> <input id="worker_name" type="text" required pattern="[A-Za-z\s\.\-]+" title="กรุณากรอกเป็นภาษาอังกฤษเท่านั้น" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none uppercase" oninput="this.value=this.value.replace(/[^A-Za-z\s\.\-]/g,'').toUpperCase()">
          <p class="text-[10px] text-navy-400 mt-0.5">กรอกภาษาอังกฤษเท่านั้น (ระบบแปลงเป็นพิมพ์ใหญ่อัตโนมัติ)</p>
         </div>
-        <div><label for="work_permit" class="block text-sm font-semibold text-navy-800 mb-1">เลขใบอนุญาตทำงาน <span class="text-red-500">*</span></label> <input id="work_permit" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
+        <div>
+         <label for="alien_id" class="block text-sm font-semibold text-navy-800 mb-1">เลขประจำตัวแรงงานต่างด้าว <span class="text-red-500">*</span></label> <input id="alien_id" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
          <p class="text-[10px] text-navy-400 mt-0.5">กรอกตัวเลข 13 หลักเท่านั้น</p>
         </div>
-        <div><label for="passport_no" class="block text-sm font-semibold text-navy-800 mb-1">หมายเลขหนังสือเดินทาง <span class="text-red-500">*</span></label> <input id="passport_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none uppercase" oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()">
-         <p class="text-[10px] text-navy-400 mt-0.5">ตัวอักษรและตัวเลขเท่านั้น (ระบบแปลงเป็นพิมพ์ใหญ่อัตโนมัติ)</p>
+        <div>
+         <label for="work_permit" class="block text-sm font-semibold text-navy-800 mb-1">เลขใบอนุญาตทำงาน <span class="text-red-500">*</span></label> <input id="work_permit" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
+         <p class="text-[10px] text-navy-400 mt-0.5">กรอกตัวเลข 13 หลักเท่านั้น</p>
         </div>
        </div><!-- Row 3 -->
-       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div><label for="nationality" class="block text-sm font-semibold text-navy-800 mb-1">สัญชาติ <span class="text-red-500">*</span></label> <select id="nationality" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกสัญชาติ --</option> <option>เมียนมา</option><option>ลาว</option><option>กัมพูชา</option><option>เวียดนาม</option><option>อื่น ๆ</option> </select>
-        </div>
-        <div><label for="receipt_book" class="block text-sm font-semibold text-navy-800 mb-1">ใบเสร็จรับเงินเล่มที่</label> <input id="receipt_book" type="text" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
-        </div>
-        <div><label for="receipt_no" class="block text-sm font-semibold text-navy-800 mb-1">เลขที่ใบเสร็จรับเงิน</label> <input id="receipt_no" type="text" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
-        </div>
-        <div><label for="receipt_date" class="block text-sm font-semibold text-navy-800 mb-1">วันที่ใบเสร็จรับเงิน</label> <input id="receipt_date" type="date" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
-        </div>
+       <div>
+        <label for="passport_no" class="block text-sm font-semibold text-navy-800 mb-1">หมายเลขหนังสือเดินทาง <span class="text-red-500">*</span></label> <input id="passport_no" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none uppercase" oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()">
+        <p class="text-[10px] text-navy-400 mt-0.5">ตัวอักษรและตัวเลขเท่านั้น (ระบบแปลงเป็นพิมพ์ใหญ่อัตโนมัติ)</p>
        </div><!-- Row 4 -->
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label for="employer_id" class="block text-sm font-semibold text-navy-800 mb-1">เลขประจำตัวนายจ้าง <span class="text-red-500">*</span></label> <input id="employer_id" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
-         <p class="text-[10px] text-navy-400 mt-0.5">เลขบัตรประชาชน/เลขนิติบุคคล 13 หลัก</p>
+       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+         <label for="nationality" class="block text-sm font-semibold text-navy-800 mb-1">สัญชาติ <span class="text-red-500">*</span></label> <select id="nationality" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกสัญชาติ --</option> <option>เมียนมา</option><option>ลาว</option><option>กัมพูชา</option><option>เวียดนาม</option><option>อื่น ๆ</option> </select>
         </div>
-        <div><label for="employer_name" class="block text-sm font-semibold text-navy-800 mb-1">ชื่อนายจ้าง/สถานประกอบการ <span class="text-red-500">*</span></label> <input id="employer_name" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        <div>
+         <label for="receipt_book" class="block text-sm font-semibold text-navy-800 mb-1">ใบเสร็จรับเงินเล่มที่</label> <input id="receipt_book" type="text" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        </div>
+        <div>
+         <label for="receipt_no" class="block text-sm font-semibold text-navy-800 mb-1">เลขที่ใบเสร็จรับเงิน</label> <input id="receipt_no" type="text" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
+        </div>
+        <div>
+         <label for="receipt_date" class="block text-sm font-semibold text-navy-800 mb-1">วันที่ใบเสร็จรับเงิน</label> <input id="receipt_date" type="date" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
         </div>
        </div><!-- Row 5 -->
        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label for="process_type" class="block text-sm font-semibold text-navy-800 mb-1">ประเภทการดำเนินการ <span class="text-red-500">*</span></label> <select id="process_type" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือก --</option> <option>นายจ้างดำเนินการ</option> <option>บริษัทนำคนต่างด้าวเข้ามาทำงาน</option> </select>
+        <div>
+         <label for="employer_id" class="block text-sm font-semibold text-navy-800 mb-1">เลขประจำตัวนายจ้าง <span class="text-red-500">*</span></label> <input id="employer_id" type="text" required maxlength="13" pattern="\d{13}" title="กรอกตัวเลข 13 หลัก" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)">
+         <p class="text-[10px] text-navy-400 mt-0.5">เลขบัตรประชาชน/เลขนิติบุคคล 13 หลัก</p>
         </div>
-        <div><label for="office" class="block text-sm font-semibold text-navy-800 mb-1">ยื่นเอกสารผ่านสำนักงาน <span class="text-red-500">*</span></label> <input id="office" type="text" required list="officeList" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์เพื่อค้นหา..."> <datalist id="officeList"></datalist>
+        <div>
+         <label for="employer_name" class="block text-sm font-semibold text-navy-800 mb-1">ชื่อนายจ้าง/สถานประกอบการ <span class="text-red-500">*</span></label> <input id="employer_name" type="text" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none">
         </div>
        </div><!-- Row 6 -->
        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label for="staff" class="block text-sm font-semibold text-navy-800 mb-1">เจ้าหน้าที่ผู้รับผิดชอบ <span class="text-red-500">*</span></label> <select id="staff" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกเจ้าหน้าที่ --</option> <optgroup label="👨 ชาย"> <option>นายณภัทร ทิพยโอสถ</option> <option>นายสุทธาธิโรจน์ ยางงาม</option> <option>นายสุเมธ ยิ้มพงษ์</option> </optgroup> <optgroup label="👩 หญิง"> <option>นางสาวฐิติวรดา อินทร์ประสิทธิ์</option> <option>นางสาวนุศรา กลิ่นจุน</option> <option>นางสาวพรพัสตร์ ช่วยบำรุง</option> <option>นางสาวพัชราภา สุทธิอาจ</option> <option>นางสาวมณฑกานต์ แจ่มใจ</option> <option>นางสาวเมขลา อุดมสิริสถาพร</option> <option>นางสาวศิริปรมินทร์ ขันติคเชนชาติ</option> </optgroup> </select>
+        <div>
+         <label for="process_type" class="block text-sm font-semibold text-navy-800 mb-1">ประเภทการดำเนินการ <span class="text-red-500">*</span></label> <select id="process_type" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือก --</option> <option>นายจ้างดำเนินการ</option> <option>บริษัทนำคนต่างด้าวเข้ามาทำงาน</option> </select>
         </div>
-        <div><label for="status" class="block text-sm font-semibold text-navy-800 mb-1">สถานะการดำเนินการ <span class="text-red-500">*</span></label> <select id="status" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกสถานะ --</option> <option>อยู่ระหว่างการตรวจสอบข้อมูล</option> <option>ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน</option> <option>ดำเนินการเสร็จสิ้น</option> </select>
+        <div>
+         <label for="office" class="block text-sm font-semibold text-navy-800 mb-1">ยื่นเอกสารผ่านสำนักงาน <span class="text-red-500">*</span></label> <input id="office" type="text" required list="officeList" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์เพื่อค้นหา..."> <datalist id="officeList"></datalist>
         </div>
        </div><!-- Row 7 -->
-       <div><label for="remark" class="block text-sm font-semibold text-navy-800 mb-1">หมายเหตุ</label> <textarea id="remark" rows="2" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none resize-none"></textarea>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+         <label for="staff" class="block text-sm font-semibold text-navy-800 mb-1">เจ้าหน้าที่ผู้รับผิดชอบ <span class="text-red-500">*</span></label> <select id="staff" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกเจ้าหน้าที่ --</option> <optgroup label="👨 ชาย"> <option>นายณภัทร ทิพยโอสถ</option> <option>นายสุทธาธิโรจน์ ยางงาม</option> <option>นายสุเมธ ยิ้มพงษ์</option> </optgroup> <optgroup label="👩 หญิง"> <option>นางสาวฐิติวรดา อินทร์ประสิทธิ์</option> <option>นางสาวนุศรา กลิ่นจุน</option> <option>นางสาวพรพัสตร์ ช่วยบำรุง</option> <option>นางสาวพัชราภา สุทธิอาจ</option> <option>นางสาวมณฑกานต์ แจ่มใจ</option> <option>นางสาวเมขลา อุดมสิริสถาพร</option> <option>นางสาวศิริปรมินทร์ ขันติคเชนชาติ</option> </optgroup> </select>
+        </div>
+        <div>
+         <label for="status" class="block text-sm font-semibold text-navy-800 mb-1">สถานะการดำเนินการ <span class="text-red-500">*</span></label> <select id="status" required class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none bg-white"> <option value="">-- เลือกสถานะ --</option> <option>อยู่ระหว่างการตรวจสอบข้อมูล</option> <option>ดำเนินการบันทึกข้อมูลเรียบร้อยรอแจ้งหน่วยงาน</option> <option>ดำเนินการเสร็จสิ้น</option> </select>
+        </div>
+       </div><!-- Row 8 -->
+       <div>
+        <label for="remark" class="block text-sm font-semibold text-navy-800 mb-1">หมายเหตุ</label> <textarea id="remark" rows="2" class="form-input w-full px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none resize-none"></textarea>
        </div>
-       <div class="flex gap-3 pt-2"><button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2"> <i data-lucide="save" class="w-4 h-4"></i>บันทึกข้อมูล </button> <button type="reset" class="px-6 py-2.5 bg-navy-100 text-navy-700 rounded-lg text-sm font-semibold hover:bg-navy-200 transition flex items-center gap-2"> <i data-lucide="rotate-ccw" class="w-4 h-4"></i>ล้างฟอร์ม </button>
+       <div class="flex gap-3 pt-2">
+        <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2"> <i data-lucide="save" class="w-4 h-4"></i>บันทึกข้อมูล </button> <button type="reset" class="px-6 py-2.5 bg-navy-100 text-navy-700 rounded-lg text-sm font-semibold hover:bg-navy-200 transition flex items-center gap-2"> <i data-lucide="rotate-ccw" class="w-4 h-4"></i>ล้างฟอร์ม </button>
        </div>
       </form>
      </div>
@@ -206,8 +233,10 @@ label { transition: color 0.2s; }
       </div>
       <div class="p-6">
        <div class="flex gap-3 mb-4 items-end flex-col">
-        <div class="w-full"><label for="fetchOffice" class="block text-sm font-semibold text-navy-800 mb-1">ค้นหาจากสำนักงาน</label>
-         <div class="flex gap-3"><input id="fetchOffice" type="text" list="officeList2" class="form-input flex-1 px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์ชื่อสำนักงาน..."> <datalist id="officeList2"></datalist> <button onclick="fetchData()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="download" class="w-4 h-4"></i>เรียกดูข้อมูล </button> <button onclick="clearAllData()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="trash-2" class="w-4 h-4"></i>ล้างข้อมูล </button>
+        <div class="w-full">
+         <label for="fetchOffice" class="block text-sm font-semibold text-navy-800 mb-1">ค้นหาจากสำนักงาน</label>
+         <div class="flex gap-3">
+          <input id="fetchOffice" type="text" list="officeList2" class="form-input flex-1 px-3 py-2 border border-navy-200 rounded-lg text-sm focus:outline-none" placeholder="พิมพ์ชื่อสำนักงาน..."> <datalist id="officeList2"></datalist> <button onclick="fetchData()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="download" class="w-4 h-4"></i>เรียกดูข้อมูล </button> <button onclick="clearAllData()" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition flex items-center gap-2 h-[38px]"> <i data-lucide="trash-2" class="w-4 h-4"></i>ล้างข้อมูล </button>
          </div>
         </div>
         <div id="fetchResult" class="w-full text-sm text-navy-500 text-center py-8">
@@ -222,7 +251,8 @@ label { transition: color 0.2s; }
       <div class="bg-gradient-to-r from-navy-800 to-navy-700 px-6 py-4">
        <h1 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-gold-400"></i>รายงานจำนวนรายการข้อมูลทั้งหมด</h1>
       </div>
-      <div class="p-6"><button onclick="loadReportAll()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
+      <div class="p-6">
+       <button onclick="loadReportAll()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
        <div id="reportAllContent" class="text-sm text-navy-500 text-center py-8">
         กดปุ่มโหลดข้อมูลเพื่อดูรายงาน
        </div>
@@ -234,7 +264,8 @@ label { transition: color 0.2s; }
       <div class="bg-gradient-to-r from-navy-800 to-navy-700 px-6 py-4">
        <h1 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-gold-400"></i>รายงานจำนวนรายการตามเจ้าหน้าที่</h1>
       </div>
-      <div class="p-6"><button onclick="loadReportStaff()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
+      <div class="p-6">
+       <button onclick="loadReportStaff()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
        <div id="reportStaffContent" class="text-sm text-navy-500 text-center py-8">
         กดปุ่มโหลดข้อมูลเพื่อดูรายงาน
        </div>
@@ -246,7 +277,8 @@ label { transition: color 0.2s; }
       <div class="bg-gradient-to-r from-navy-800 to-navy-700 px-6 py-4">
        <h1 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-gold-400"></i>รายงานจำนวนรายการตามสถานะ</h1>
       </div>
-      <div class="p-6"><button onclick="loadReportStatus()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
+      <div class="p-6">
+       <button onclick="loadReportStatus()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
        <div id="reportStatusContent" class="text-sm text-navy-500 text-center py-8">
         กดปุ่มโหลดข้อมูลเพื่อดูรายงาน
        </div>
@@ -258,17 +290,16 @@ label { transition: color 0.2s; }
       <div class="bg-gradient-to-r from-navy-800 to-navy-700 px-6 py-4">
        <h1 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-gold-400"></i>รายงานจำนวนรายการตามสำนักงาน</h1>
       </div>
-      <div class="p-6"><button onclick="loadReportOffice()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
+      <div class="p-6">
+       <button onclick="loadReportOffice()" class="px-5 py-2 bg-gradient-to-r from-navy-800 to-navy-700 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i>โหลดข้อมูล</button>
        <div id="reportOfficeContent" class="text-sm text-navy-500 text-center py-8">
         กดปุ่มโหลดข้อมูลเพื่อดูรายงาน
        </div>
       </div>
      </div>
     </div>
-   </main>
-  </div>
-  <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw--ZkpxZP9Cvwh1dxV2DGKX96gXWVsd258lwvvPBkwZ9bWCjLg7h_ue3gII41AjHaE/exec';
+    <script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyIg9ydURtQsnoCSTGYpBhwc-mMVQKGdDswBKSm-s_3vT-3t8A0SwQLZ9dcA73x70N7/exec';
 
 const offices = ["สจก.พื้นที่ 1","สจก.พื้นที่ 2","สจก.พื้นที่ 3","สจก.พื้นที่ 4","สจก.พื้นที่ 5","สจก.พื้นที่ 6","สจก.พื้นที่ 7","สจก.พื้นที่ 8","สจก.พื้นที่ 9","สจก.พื้นที่ 10","สจจ.กระบี่","สจจ.กาญจนบุรี","สจจ.กาฬสินธุ์","สจจ.กำแพงเพชร","สจจ.ขอนแก่น","สจจ.จันทบุรี","สจจ.ฉะเชิงเทรา","สจจ.ชลบุรี","สจจ.ชัยนาท","สจจ.ชัยภูมิ","สจจ.ชุมพร","สจจ.เชียงราย","สจจ.เชียงใหม่","สจจ.ตรัง","สจจ.ตราด","สจจ.ตาก","สจจ.นครนายก","สจจ.นครปฐม","สจจ.นครพนม","สจจ.นครราชสีมา","สจจ.นครศรีธรรมราช","สจจ.นครสวรรค์","สจจ.นนทบุรี","สจจ.นราธิวาส","สจจ.น่าน","สจจ.บึงกาฬ","สจจ.บุรีรัมย์","สจจ.ปทุมธานี","สจจ.ประจวบคีรีขันธ์","สจจ.ปราจีนบุรี","สจจ.ปัตตานี","สจจ.พระนครศรีอยุธยา","สจจ.พะเยา","สจจ.พังงา","สจจ.พัทลุง","สจจ.พิจิตร","สจจ.พิษณุโลก","สจจ.เพชรบุรี","สจจ.เพชรบูรณ์","สจจ.แพร่","สจจ.ภูเก็ต","สจจ.มหาสารคาม","สจจ.มุกดาหาร","สจจ.แม่ฮ่องสอน","สจจ.ยโสธร","สจจ.ยะลา","สจจ.ร้อยเอ็ด","สจจ.ระนอง","สจจ.ระยอง","สจจ.ราชบุรี","สจจ.ลพบุรี","สจจ.ลำปาง","สจจ.ลำพูน","สจจ.เลย","สจจ.ศรีสะเกษ","สจจ.สกลนคร","สจจ.สงขลา","สจจ.สตูล","สจจ.สมุทรปราการ","สจจ.สมุทรสงคราม","สจจ.สมุทรสาคร","สจจ.สระแก้ว","สจจ.สระบุรี","สจจ.สิงห์บุรี","สจจ.สุโขทัย","สจจ.สุพรรณบุรี","สจจ.สุราษฎร์ธานี","สจจ.สุรินทร์","สจจ.หนองคาย","สจจ.หนองบัวลำภู","สจจ.อ่างทอง","สจจ.อุดรธานี","สจจ.อุตรดิตถ์","สจจ.อุทัยธานี","สจจ.อุบลราชธานี","สจจ.อำนาจเจริญ"];
 
@@ -323,17 +354,74 @@ async function submitForm(e) {
   e.preventDefault();
   Swal.fire({ title:'กำลังบันทึกข้อมูล...', text:'กรุณารอสักครู่', allowOutsideClick:false, didOpen:()=>Swal.showLoading() });
   try {
-    const fields = ['request_no','request_date','worker_name','work_permit','passport_no','nationality','receipt_book','receipt_no','receipt_date','employer_id','employer_name','process_type','office','staff','status','remark'];
+    const fields = ['request_no','request_date','worker_name','alien_id','work_permit','passport_no','nationality','receipt_book','receipt_no','receipt_date','employer_id','employer_name','process_type','office','staff','status','remark'];
     const params = { action:'create' };
     fields.forEach(f => { params[f] = document.getElementById(f).value; });
     // Add Thai datetime for status timestamp
     params['status_datetime'] = formatThaiDateTime(new Date());
     const result = await jsonpRequest(params);
     if(result && result.success) {
-      Swal.fire({ icon:'success', title:'บันทึกสำเร็จ!', text:'ข้อมูลถูกบันทึกเรียบร้อยแล้ว', confirmButtonColor:'#243b53' });
-      document.getElementById('entryForm').reset();
+      const workerName = document.getElementById('worker_name').value;
+      const requestNo = document.getElementById('request_no').value;
+      const requestDate = formatDateToThai(document.getElementById('request_date').value);
+      const employerName = document.getElementById('employer_name').value;
+      const staff = document.getElementById('staff').value;
+      
+      Swal.fire({
+        icon: 'success',
+        title: '<span style="color:#243b53">✓ บันทึกสำเร็จ!</span>',
+        html: `
+          <div style="text-align:left; background:#f0f4f8; padding:20px; border-radius:12px; margin:15px 0">
+            <div style="margin-bottom:12px">
+              <span style="color:#486581; font-size:12px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px">ข้อมูลที่บันทึก</span>
+            </div>
+            <div style="display:grid; gap:12px; font-size:13px">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-left:3px solid #e5a917; border-radius:6px">
+                <span style="color:#486581; font-weight:600">เลขรับคำขอ</span>
+                <span style="color:#243b53; font-weight:700">${esc(requestNo)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-left:3px solid #e5a917; border-radius:6px">
+                <span style="color:#486581; font-weight:600">ชื่อแรงงาน</span>
+                <span style="color:#243b53; font-weight:700">${esc(workerName)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-left:3px solid #e5a917; border-radius:6px">
+                <span style="color:#486581; font-weight:600">วันที่รับคำขอ</span>
+                <span style="color:#243b53; font-weight:700">${requestDate}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-left:3px solid #e5a917; border-radius:6px">
+                <span style="color:#486581; font-weight:600">นายจ้าง</span>
+                <span style="color:#243b53; font-weight:700">${esc(employerName)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-left:3px solid #e5a917; border-radius:6px">
+                <span style="color:#486581; font-weight:600">เจ้าหน้าที่ผู้รับผิดชอบ</span>
+                <span style="color:#243b53; font-weight:700">${esc(staff)}</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#627d98; margin-top:15px">
+            ระบบได้บันทึกข้อมูลลงในฐานข้อมูลเรียบร้อยแล้ว
+          </div>
+        `,
+        confirmButtonColor: '#243b53',
+        confirmButtonText: '✓ ตกลง',
+        allowOutsideClick: false,
+        didClose: () => {
+          document.getElementById('entryForm').reset();
+        }
+      });
     } else {
-      Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: result?.message || 'ไม่สามารถบันทึกได้', confirmButtonColor:'#243b53' });
+      Swal.fire({
+        icon: 'error',
+        title: '<span style="color:#dc2626">✕ เกิดข้อผิดพลาด</span>',
+        html: `
+          <div style="text-align:left; background:#fee2e2; padding:15px; border-radius:8px; margin:15px 0; border-left:4px solid #dc2626">
+            <span style="color:#991b1b; font-size:13px">${result?.message || 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง'}</span>
+          </div>
+        `,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: '✓ ปิด',
+        allowOutsideClick: false
+      });
     }
   } catch(err) {
     Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: err.message, confirmButtonColor:'#243b53' });
@@ -586,5 +674,7 @@ if (window.elementSdk) {
 populateOffices();
 lucide.createIcons();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e95e8ac4359a1c0',t:'MTc3NTY5OTkyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+   </main>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ec2cc4e816b0886',t:'MTc3NjE3MDYyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
